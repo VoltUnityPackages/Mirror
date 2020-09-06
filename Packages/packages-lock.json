@@ -88,6 +88,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.vis2k.telepathy": {
+      "version": "https://github.com/VoltUnityPackages/Telepathy.git?path=/src",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "c65283046a817aa688a3d390494bbe5f31fb2fff"
+    },
     "nuget.mono-cecil": {
       "version": "0.1.6-preview",
       "depth": 1,
