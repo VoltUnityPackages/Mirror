@@ -1,0 +1,46 @@
+{
+  "name": "com.mirror-networking.mirror",
+  "displayName": "Mirror",
+  "version": "18.0.0",
+  "unity": "2019.1",
+  "description": "A community replacement for Unity's abandoned UNET Networking System.",
+  "author": "Unity Technologies, vis2k, Paul and Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VoltUnityPackages/Mirror.git"
+  },
+  "type": "library",
+  "testables": ["com.unity.test-framework", "com.unity.ext.nunit"],
+  "samples": [
+    {
+        "displayName": "Basic",
+        "description": "Basic is what it sounds like...the most rudimentary baseline of a networked game. Features SyncVars updating random UI data for each player.",
+        "path": "Samples~/Basic"
+    },
+    {
+      "displayName": "Tanks",
+      "description": "This is a simple scene with animated tanks, networked rigidbody projectiles, and NavMesh movement",
+      "path": "Samples~/Tanks"
+    },
+    {
+      "displayName": "Pong",
+      "description": "A simple example for 'How to build a multiplayer game with Mirror' is Pong. It illustrates the usage of NetworkManager, NetworkManagerHUD, NetworkBehaviour, NetworkIdentity, NetworkTransform, NetworkStartPositionand various Attributes.",
+      "path": "Samples~/Pong"
+    },
+    {
+      "displayName": "Additive Scenes",
+      "description": "The Additive Scenes example demonstrates a server additively loading a sub-scene into a main scene at startup, and having a server-only trigger that generates a message to any client whose player enters the trigger zone to also load the sub-scene, and subsequently unload it when they leave the trigger zone. Only players inside the trigger zone can see the objects in the sub-scene. Network Proximity Checker components are key to making this scenario work.",
+      "path": "Samples~/AdditiveScenes"
+    },
+    {
+      "displayName": "Multiple Concurrent Additive Scenes",
+      "description": "The Multiple Concurrent Additive Scenes example demonstrates a server additively loading multiple instances of a sub-scene into a main scene at startup, with physics separation, and assigning players to the instances to play matches independently. NetworkSceneChecker is the key component that makes this example work.",
+      "path": "Samples~/MultipleAdditiveScenes"
+    },
+    {
+      "displayName": "Room System",
+      "description": "The Room System example demonstrates how to set up a 'staging' scene where players assemble before starting a match. When all players are ready, the server sends them all a message to change scenes (along with the server itself) to the actual game play scene so they all come in at once. Includes fully playable game with a character controller where players collect server-spawned prizes for score.",
+      "path": "Samples~/Room"
+    }
+]
+}
