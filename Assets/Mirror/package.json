@@ -4,7 +4,7 @@
   "version": "18.0.0",
   "unity": "2019.1",
   "description": "A community replacement for Unity's abandoned UNET Networking System.",
-  "author": "Unity Technologies, vis2k, Paul and Contributors",
+  "author": "Mirror Networking",
   "repository": {
     "type": "git",
     "url": "https://github.com/VoltUnityPackages/Mirror.git"
