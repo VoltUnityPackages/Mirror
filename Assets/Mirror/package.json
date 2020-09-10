@@ -1,7 +1,7 @@
 {
   "name": "com.mirror-networking.mirror",
   "displayName": "Mirror",
-  "version": "18.0.0",
+  "version": "19.0.1",
   "unity": "2019.1",
   "description": "A community replacement for Unity's abandoned UNET Networking System.",
   "author": "Mirror Networking",
