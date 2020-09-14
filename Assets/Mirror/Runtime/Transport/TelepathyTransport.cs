@@ -43,7 +43,6 @@ namespace Mirror
         [Tooltip("Client processes a limit amount of messages per tick to avoid a deadlock where it might end up processing forever if messages come in faster than we can process them.")]
         public int clientMaxReceivesPerTick = 1000;
 
-
         protected Telepathy.Client client = new Telepathy.Client();
         protected Telepathy.Server server = new Telepathy.Server();
 
@@ -171,6 +170,11 @@ namespace Mirror
             builder.Host = Dns.GetHostName();
             builder.Port = port;
             return builder.Uri;
+        }
+
+        public override int GetConnectionRtt(uint connectionId)
+        {
+            return 0;
         }
 
         // server

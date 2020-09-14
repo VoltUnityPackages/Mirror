@@ -1,4 +1,4 @@
-﻿// memory transport for easier testing
+// memory transport for easier testing
 // note: file needs to be outside of Editor folder, otherwise AddComponent
 //       can't be called with MemoryTransport
 using System;
@@ -81,6 +81,12 @@ namespace Mirror.Tests
                 clientConnected = false;
             }
         }
+
+        public override int GetConnectionRtt(uint connectionId)
+        {
+            return 0;
+        }
+
         void ProcessClientMessages()
         {
             // note: process even if not connected because when calling

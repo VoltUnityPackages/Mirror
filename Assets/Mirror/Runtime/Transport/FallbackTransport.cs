@@ -103,6 +103,11 @@ namespace Mirror
             available.ClientDisconnect();
         }
 
+        public override int GetConnectionRtt(uint connectionId)
+        {
+            return available.GetConnectionRtt(connectionId);
+        }
+
         public override bool ClientSend(int channelId, ArraySegment<byte> segment)
         {
             return available.ClientSend(channelId, segment);
