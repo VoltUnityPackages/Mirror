@@ -21,7 +21,7 @@ namespace Mirror.Tests.Runtime
             // load scene
             yield return EditorSceneManager.LoadSceneAsyncInPlayMode(ScenePath, new LoadSceneParameters { loadSceneMode = LoadSceneMode.Additive });
             Scene scene = SceneManager.GetSceneByPath(ScenePath);
-            SceneManager.SetActiveScene(scene);
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene);
 
             // wait for networkmanager to awake
             yield return null;
@@ -41,7 +41,7 @@ namespace Mirror.Tests.Runtime
 
             // unload scene
             Scene scene = SceneManager.GetSceneByPath(ScenePath);
-            yield return SceneManager.UnloadSceneAsync(scene);
+            yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
         }
 
         [UnityTest]

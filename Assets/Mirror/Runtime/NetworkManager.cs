@@ -248,7 +248,7 @@ namespace Mirror
             networkSceneName = offlineScene;
 
             // setup OnSceneLoaded callback
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         /// <summary>
