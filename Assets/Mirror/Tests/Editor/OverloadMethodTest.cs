@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace Mirror.Tests.MessageTests
 {
-    class NoArgMethodMessage : IMessageBase
+    class NoArgMethodMessage : NetworkMessage
     {
         public int someValue;
 
@@ -15,7 +15,7 @@ namespace Mirror.Tests.MessageTests
         public void Deserialize(NetworkReader reader) { }
     }
 
-    class TwoArgMethodMessage : IMessageBase
+    class TwoArgMethodMessage : NetworkMessage
     {
         public int someValue;
 
@@ -40,7 +40,7 @@ namespace Mirror.Tests.MessageTests
                 someValue = value
             };
 
-            byte[] data = MessagePacker.Pack(intMessage);
+            byte[] data = MessagePackerTest.PackToByteArray(intMessage);
 
             NoArgMethodMessage unpacked = MessagePacker.Unpack<NoArgMethodMessage>(data);
 
@@ -56,7 +56,7 @@ namespace Mirror.Tests.MessageTests
                 someValue = value
             };
 
-            byte[] data = MessagePacker.Pack(intMessage);
+            byte[] data = MessagePackerTest.PackToByteArray(intMessage);
 
             TwoArgMethodMessage unpacked = MessagePacker.Unpack<TwoArgMethodMessage>(data);
 

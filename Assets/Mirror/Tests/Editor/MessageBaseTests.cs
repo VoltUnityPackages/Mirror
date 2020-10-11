@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace Mirror.Tests.MessageTests
 {
-    struct TestMessage : IMessageBase
+    struct TestMessage : NetworkMessage
     {
         public int IntValue;
         public string StringValue;
@@ -30,7 +30,7 @@ namespace Mirror.Tests.MessageTests
         }
     }
 
-    struct StructWithEmptyMethodMessage : IMessageBase
+    struct StructWithEmptyMethodMessage : NetworkMessage
     {
         public int IntValue;
         public string StringValue;
@@ -41,7 +41,7 @@ namespace Mirror.Tests.MessageTests
         public void Serialize(NetworkWriter writer) { }
     }
 
-    class ClassWithoutBaseMessage : IMessageBase
+    class ClassWithoutBaseMessage : NetworkMessage
     {
         public int[] array;
 
@@ -50,7 +50,7 @@ namespace Mirror.Tests.MessageTests
         public void Serialize(NetworkWriter writer) { }
     }
 
-    abstract class AbstractMessage : IMessageBase
+    abstract class AbstractMessage : NetworkMessage
     {
         public abstract void Deserialize(NetworkReader reader);
         public abstract void Serialize(NetworkWriter writer);
@@ -65,7 +65,7 @@ namespace Mirror.Tests.MessageTests
         public override void Deserialize(NetworkReader reader) { }
     }
 
-    class Layer1Message : IMessageBase
+    class Layer1Message : NetworkMessage
     {
         public int value1;
 
@@ -83,13 +83,24 @@ namespace Mirror.Tests.MessageTests
         public int value3;
     }
 
+    class NullableObject
+    {
+        public int id = 3;
+    }
+
+    class NullableObjectMessage : NetworkMessage
+    {
+        public string name;
+        public NullableObject nullObj;
+    }
+
     [TestFixture]
     public class MessageBaseTests
     {
         [Test]
         public void StructWithMethods()
         {
-            byte[] arr = MessagePacker.Pack(new TestMessage(1, "2", 3.3));
+            byte[] arr = MessagePackerTest.PackToByteArray(new TestMessage(1, "2", 3.3));
             TestMessage t = MessagePacker.Unpack<TestMessage>(arr);
 
             Assert.AreEqual(1, t.IntValue);
@@ -98,7 +109,7 @@ namespace Mirror.Tests.MessageTests
         [Test]
         public void StructWithEmptyMethods()
         {
-            byte[] arr = MessagePacker.Pack(new StructWithEmptyMethodMessage { IntValue = 1, StringValue = "2", DoubleValue = 3.3 });
+            byte[] arr = MessagePackerTest.PackToByteArray(new StructWithEmptyMethodMessage { IntValue = 1, StringValue = "2", DoubleValue = 3.3 });
             StructWithEmptyMethodMessage t = MessagePacker.Unpack<StructWithEmptyMethodMessage>(arr);
 
             Assert.AreEqual(1, t.IntValue);
@@ -114,7 +125,7 @@ namespace Mirror.Tests.MessageTests
                 array = new[] { 3, 4, 5 }
             };
 
-            byte[] data = MessagePacker.Pack(intMessage);
+            byte[] data = MessagePackerTest.PackToByteArray(intMessage);
 
             ClassWithoutBaseMessage unpacked = MessagePacker.Unpack<ClassWithoutBaseMessage>(data);
 
@@ -130,7 +141,7 @@ namespace Mirror.Tests.MessageTests
                 someValue = value
             };
 
-            byte[] data = MessagePacker.Pack(intMessage);
+            byte[] data = MessagePackerTest.PackToByteArray(intMessage);
 
             OverrideMessage unpacked = MessagePacker.Unpack<OverrideMessage>(data);
 
@@ -150,13 +161,30 @@ namespace Mirror.Tests.MessageTests
                 value3 = value3
             };
 
-            byte[] data = MessagePacker.Pack(intMessage);
+            byte[] data = MessagePackerTest.PackToByteArray(intMessage);
 
             Layer3Message unpacked = MessagePacker.Unpack<Layer3Message>(data);
 
             Assert.That(unpacked.value1, Is.EqualTo(value1));
             Assert.That(unpacked.value2, Is.EqualTo(value2));
             Assert.That(unpacked.value3, Is.EqualTo(value3));
+        }
+
+        [Test]
+        public void NullObjectMessageTest()
+        {
+            NullableObjectMessage nullableObjectMessage = new NullableObjectMessage
+            {
+                name = "pepe",
+                nullObj = null
+            };
+
+            byte[] data = MessagePackerTest.PackToByteArray(nullableObjectMessage);
+
+            NullableObjectMessage unpacked = MessagePacker.Unpack<NullableObjectMessage>(data);
+
+            Assert.That(unpacked.name, Is.EqualTo("pepe"));
+            Assert.That(unpacked.nullObj, Is.Null);
         }
     }
 }
