@@ -2,31 +2,22 @@ using NUnit.Framework;
 
 namespace Mirror.Tests.MessageTests
 {
-    class NoArgMethodMessage : NetworkMessage
+    struct NoArgMethodMessage : NetworkMessage
     {
         public int someValue;
 
         // Weaver should ignore these methods because they have no args
         public void Serialize() { /* method with no arg */ }
         public void Deserialize() { /* method with no arg */ }
-
-        // Mirror will fill out these empty methods
-        public void Serialize(NetworkWriter writer) { }
-        public void Deserialize(NetworkReader reader) { }
     }
 
-    class TwoArgMethodMessage : NetworkMessage
+    struct TwoArgMethodMessage : NetworkMessage
     {
         public int someValue;
 
         // Weaver should ignore these methods because they have two args
         public void Serialize(NetworkWriter writer, int AnotherValue) { /* method with 2 args */ }
         public void Deserialize(NetworkReader reader, int AnotherValue) { /* method with 2 args */ }
-
-
-        // Mirror will fill out these empty methods
-        public void Serialize(NetworkWriter writer) { }
-        public void Deserialize(NetworkReader reader) { }
     }
 
     public class OverloadMethodTest
@@ -42,7 +33,7 @@ namespace Mirror.Tests.MessageTests
 
             byte[] data = MessagePackerTest.PackToByteArray(intMessage);
 
-            NoArgMethodMessage unpacked = MessagePacker.Unpack<NoArgMethodMessage>(data);
+            NoArgMethodMessage unpacked = MessagePackerTest.UnpackFromByteArray<NoArgMethodMessage>(data);
 
             Assert.That(unpacked.someValue, Is.EqualTo(value));
         }
@@ -58,7 +49,7 @@ namespace Mirror.Tests.MessageTests
 
             byte[] data = MessagePackerTest.PackToByteArray(intMessage);
 
-            TwoArgMethodMessage unpacked = MessagePacker.Unpack<TwoArgMethodMessage>(data);
+            TwoArgMethodMessage unpacked = MessagePackerTest.UnpackFromByteArray<TwoArgMethodMessage>(data);
 
             Assert.That(unpacked.someValue, Is.EqualTo(value));
         }

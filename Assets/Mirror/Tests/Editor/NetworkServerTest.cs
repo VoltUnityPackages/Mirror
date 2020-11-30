@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Mirror.RemoteCalls;
 using NUnit.Framework;
 using UnityEngine;
@@ -42,10 +43,6 @@ namespace Mirror.Tests
         public string StringValue;
         public double DoubleValue;
 #pragma warning restore CS0649 // Field is never assigned to
-
-        // Mirror will fill out these empty methods
-        public void Deserialize(NetworkReader reader) { }
-        public void Serialize(NetworkWriter writer) { }
     }
 
     public class CommandTestNetworkBehaviour : NetworkBehaviour
@@ -748,8 +745,7 @@ namespace Mirror.Tests
             TestMessage1 message = new TestMessage1 { IntValue = 1, DoubleValue = 2, StringValue = "3" };
 
             // send it to all
-            bool result = NetworkServer.SendToAll(message);
-            Assert.That(result, Is.True);
+            NetworkServer.SendToAll(message);
 
             // update local connection once so that the incoming queue is processed
             connection.connectionToServer.Update();
@@ -1120,31 +1116,19 @@ namespace Mirror.Tests
         }
 
         [Test]
-        public void ResetTest()
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            NetworkServer.Reset();
-#pragma warning restore CS0618 // Type or member is obsolete
-            Assert.That(NetworkServer.active, Is.False);
-        }
-
-        [Test]
         [TestCase(nameof(NetworkServer.SendToAll))]
         [TestCase(nameof(NetworkServer.SendToReady))]
         public void SendCalledWhileNotActive_ShouldGiveWarning(string functionName)
         {
             LogAssert.Expect(LogType.Warning, $"Can not send using NetworkServer.{functionName}<T>(T msg) because NetworkServer is not active");
-            bool success;
 
             switch (functionName)
             {
                 case nameof(NetworkServer.SendToAll):
-                    success = NetworkServer.SendToAll(new NetworkPingMessage { });
-                    Assert.That(success, Is.False);
+                    NetworkServer.SendToAll(new NetworkPingMessage { });
                     break;
                 case nameof(NetworkServer.SendToReady):
-                    success = NetworkServer.SendToReady(new NetworkPingMessage { });
-                    Assert.That(success, Is.False);
+                    NetworkServer.SendToReady(new NetworkPingMessage { });
                     break;
                 default:
                     Debug.LogError("Could not find function name");
@@ -1206,6 +1190,48 @@ namespace Mirror.Tests
 
             NetworkServer.connections.Clear();
             NetworkServer.RemoveLocalConnection();
+        }
+
+        // updating NetworkServer with a null entry in NetworkIdentity.spawned
+        // should log a warning.
+        [Test]
+        public void UpdateDetectsNullEntryInSpawned()
+        {
+            // start
+            NetworkServer.Listen(1);
+
+            // add null
+            NetworkIdentity.spawned[42] = null;
+
+            // update
+            LogAssert.Expect(LogType.Warning, new Regex("Found 'null' entry in spawned list.*"));
+            NetworkServer.Update();
+
+            // clean up
+            NetworkServer.Shutdown();
+        }
+
+        // updating NetworkServer with a null entry in NetworkIdentity.spawned
+        // should log a warning.
+        // => need extra test because of Unity's custom null check
+        [Test]
+        public void UpdateDetectsDestroyedEntryInSpawned()
+        {
+            // start
+            NetworkServer.Listen(1);
+
+            // add destroyed
+            GameObject go = new GameObject();
+            NetworkIdentity ni = go.AddComponent<NetworkIdentity>();
+            NetworkIdentity.spawned[42] = ni;
+            GameObject.DestroyImmediate(go);
+
+            // update
+            LogAssert.Expect(LogType.Warning, new Regex("Found 'null' entry in spawned list.*"));
+            NetworkServer.Update();
+
+            // clean up
+            NetworkServer.Shutdown();
         }
     }
 }

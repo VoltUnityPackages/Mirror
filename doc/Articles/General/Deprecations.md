@@ -63,7 +63,7 @@ The currently defined channels are:
     Removed as part of separating Transports to components. Not all transports use ports, but those that do have a field for it. See [Transports](../Transports/index.md) for more info.
 
 -   `IsHeadless()`  
-    Use `isHeadless` instead, as it's a property now.
+    Use compiler symbol `UNITY_SERVER` instead.
 
 -   `client`  
     Use NetworkClient directly, it will be made static soon. For example, use `NetworkClient.Send(message)` instead of `NetworkManager.client.Send(message)`.
@@ -236,6 +236,22 @@ Basic messages of simple types were all removed as unnecessary bloat. You can cr
 -   `DoubleMessage`
 -   `EmptyMessage`
 
+NetworkMessage requires structs in all cases - classes no longer supported
+
+### NetworkReader
+
+-   `Read(byte[] buffer, int offset, int count)`  
+    Use `ReadBytes` instead.
+
+-   `ReadPackedInt32(int value)` 
+    Use `ReadInt32(int value)` instead
+
+-   `ReadPackedUInt32(uint value)` 
+    Use `ReadUInt32(uint value)` instead
+
+-   `ReadPackedUInt64(ulong value)` 
+    Use `ReadUInt64(ulong value)` instead
+
 ### NetworkWriter
 
 -   `Write(bool value)`  
@@ -330,6 +346,15 @@ Basic messages of simple types were all removed as unnecessary bloat. You can cr
 
 -   `Write(byte[] buffer, int offset, int count)`  
     Use `WriteBytes` instead.
+
+-   `WritePackedInt32(int value)` 
+    Use `WriteInt32(int value)` instead
+
+-   `WritePackedUInt32(uint value)` 
+    Use `WriteUInt32(uint value)` instead
+
+-   `WritePackedUInt64(ulong value)` 
+    Use `WriteUInt64(ulong value)` instead
 
 ### Transport
 

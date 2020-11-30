@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Security.Cryptography;
 using Mirror.RemoteCalls;
 using UnityEngine;
@@ -38,72 +37,75 @@ namespace Mirror
     ///     The NetworkIdentity manages the dirty state of the NetworkBehaviours of the object.
     ///     When it discovers that NetworkBehaviours are dirty, it causes an update packet to be created and sent to clients.
     /// </para>
-    /// <para>
-    ///     The flow for serialization updates managed by the NetworkIdentity is:
+    /// 
     /// <list type="bullet">
-    ///     <item>
+    ///     <listheader><description>
+    ///         The flow for serialization updates managed by the NetworkIdentity is:
+    ///     </description></listheader>
+    ///     
+    ///     <item><description>
     ///         Each NetworkBehaviour has a dirty mask. This mask is available inside OnSerialize as syncVarDirtyBits
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         Each SyncVar in a NetworkBehaviour script is assigned a bit in the dirty mask.
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         Changing the value of SyncVars causes the bit for that SyncVar to be set in the dirty mask
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         Alternatively, calling SetDirtyBit() writes directly to the dirty mask
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         NetworkIdentity objects are checked on the server as part of it&apos;s update loop
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         If any NetworkBehaviours on a NetworkIdentity are dirty, then an UpdateVars packet is created for that object
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         The UpdateVars packet is populated by calling OnSerialize on each NetworkBehaviour on the object
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         NetworkBehaviours that are NOT dirty write a zero to the packet for their dirty bits
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         NetworkBehaviours that are dirty write their dirty mask, then the values for the SyncVars that have changed
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         If OnSerialize returns true for a NetworkBehaviour, the dirty mask is reset for that NetworkBehaviour,
     ///         so it will not send again until its value changes.
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         The UpdateVars packet is sent to ready clients that are observing the object
-    ///     </item>
+    ///     </description></item>
     /// </list>
-    /// </para>
-    /// <para>
-    ///     On the client:
+    /// 
     /// <list type="bullet">
-    ///     <item>
+    ///     <listheader><description>
+    ///         On the client:
+    ///     </description></listheader>
+    ///     <item><description>
     ///         an UpdateVars packet is received for an object
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         The OnDeserialize function is called for each NetworkBehaviour script on the object
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         Each NetworkBehaviour script on the object reads a dirty mask.
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         If the dirty mask for a NetworkBehaviour is zero, the OnDeserialize functions returns without reading any more
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         If the dirty mask is non-zero value, then the OnDeserialize function reads the values for the SyncVars that correspond to the dirty bits that are set
-    ///     </item>
-    ///     <item>
+    ///     </description></item>
+    ///     <item><description>
     ///         If there are SyncVar hook functions, those are invoked with the value read from the stream.
-    ///     </item>
+    ///     </description></item>
     /// </list>
-    /// </para>
     /// </remarks>
     [DisallowMultipleComponent]
     [AddComponentMenu("Network/NetworkIdentity")]
-    [HelpURL("https://mirror-networking.com/docs/Components/NetworkIdentity.html")]
+    [HelpURL("https://mirror-networking.com/docs/Articles/Components/NetworkIdentity.html")]
     public sealed class NetworkIdentity : MonoBehaviour
     {
         static readonly ILogger logger = LogFactory.GetLogger<NetworkIdentity>();
@@ -187,6 +189,7 @@ namespace Mirror
         /// Flag to make this object only exist when the game is running as a server (or host).
         /// </summary>
         [FormerlySerializedAs("m_ServerOnly")]
+        [Tooltip("Prevents this object from being spawned / enabled on clients")]
         public bool serverOnly;
 
         /// <summary>
@@ -211,9 +214,7 @@ namespace Mirror
 
             internal set
             {
-                if (_connectionToClient != null)
-                    _connectionToClient.RemoveOwnedObject(this);
-
+                _connectionToClient?.RemoveOwnedObject(this);
                 _connectionToClient = value;
                 _connectionToClient?.AddOwnedObject(this);
             }
@@ -239,11 +240,11 @@ namespace Mirror
         void CreateNetworkBehavioursCache()
         {
             networkBehavioursCache = GetComponents<NetworkBehaviour>();
-            if (NetworkBehaviours.Length > 64)
+            if (networkBehavioursCache.Length > byte.MaxValue)
             {
-                logger.LogError($"Only 64 NetworkBehaviour components are allowed for NetworkIdentity: {name} because of the dirtyComponentMask", this);
+                logger.LogError($"Only {byte.MaxValue} NetworkBehaviour components are allowed for NetworkIdentity: {name} because we send the index as byte.", this);
                 // Log error once then resize array so that NetworkIdentity does not throw exceptions later
-                Array.Resize(ref networkBehavioursCache, 64);
+                Array.Resize(ref networkBehavioursCache, byte.MaxValue);
             }
         }
 
@@ -268,20 +269,22 @@ namespace Mirror
         /// Unique identifier used to find the source assets when server spawns the on clients.
         /// </summary>
         /// <remarks>
-        /// The AssetId trick:
         /// <list type="bullet">
-        ///     <item>
+        /// <listheader><description>
+        ///     The AssetId trick:
+        /// </description></listheader>
+        ///     <item><description>
         ///         Ideally we would have a serialized 'Guid m_AssetId' but Unity can't
         ///         serialize it because Guid's internal bytes are private
-        ///     </item>
-        ///     <item>
+        ///     </description></item>
+        ///     <item><description>
         ///         UNET used 'NetworkHash128' originally, with byte0, ..., byte16
         ///         which works, but it just unnecessary extra code
-        ///     </item>
-        ///     <item>
+        ///     </description></item>
+        ///     <item><description>
         ///         Using just the Guid string would work, but it's 32 chars long and
         ///         would then be sent over the network as 64 instead of 16 bytes
-        ///     </item>
+        ///     </description></item>
         /// </list>
         /// The solution is to serialize the string internally here and then
         /// use the real 'Guid' type for everything else via .assetId
@@ -381,7 +384,7 @@ namespace Mirror
         /// <para>Whenever an object is spawned with client authority, or the client authority status of an object is changed with AssignClientAuthority or RemoveClientAuthority, then this callback will be invoked.</para>
         /// <para>This callback is only invoked on the server.</para>
         /// </summary>
-        public static ClientAuthorityCallback clientAuthorityCallback;
+        public static event ClientAuthorityCallback clientAuthorityCallback;
 
         /// <summary>
         /// this is used when a connection is destroyed, since the "observers" property is read-only
@@ -564,11 +567,18 @@ namespace Mirror
         //    if no scene is in build settings then Editor and Build have
         //    different indices too (Editor=0, Build=-1)
         // => ONLY USE THIS FROM POSTPROCESSSCENE!
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public void SetSceneIdSceneHashPartInternal()
         {
+            // Use `ToLower` to that because BuildPipeline.BuildPlayer is case insensitive but hash is case sensitive
+            // If the scene in the project is `forest.unity` but `Forest.unity` is given to BuildPipeline then the
+            // BuildPipeline will use `Forest.unity` for the build and create a different hash than the editor will.
+            // Using ToLower will mean the hash will be the same for these 2 paths
+            // Assets/Scenes/Forest.unity
+            // Assets/Scenes/forest.unity
+            string scenePath = gameObject.scene.path.ToLower();
+
             // get deterministic scene hash
-            uint pathHash = (uint)gameObject.scene.path.GetStableHashCode();
+            uint pathHash = (uint)scenePath.GetStableHashCode();
 
             // shift hash from 0x000000FFFFFFFF to 0xFFFFFFFF00000000
             ulong shiftedHash = (ulong)pathHash << 32;
@@ -686,7 +696,7 @@ namespace Mirror
             netId = GetNextNetworkId();
             observers = new Dictionary<int, NetworkConnection>();
 
-            if (logger.LogEnabled()) logger.Log("OnStartServer " + this + " NetId:" + netId + " SceneId:" + sceneId);
+            if (logger.LogEnabled()) logger.Log("OnStartServer " + this + " NetId:" + netId + " SceneId:" + sceneId.ToString("X"));
 
             // add to spawned (note: the original EnableIsServer isn't needed
             // because we already set m_isServer=true above)
@@ -858,17 +868,9 @@ namespace Mirror
 
         /// <summary>
         /// check if observer can be seen by connection.
-        /// <list type="bullet">
-        ///     <item>
-        ///         returns visibility.OnCheckObserver
-        ///     </item>
-        ///     <item>
-        ///         returns true if we have no NetworkVisibility, default objects are visible
-        ///     </item>
-        /// </list>
         /// </summary>
         /// <param name="conn"></param>
-        /// <returns></returns>
+        /// <returns>true if we have no NetworkVisibility, default objects are visible</returns>
         internal bool OnCheckObserver(NetworkConnection conn)
         {
             if (visibility != null)
@@ -949,48 +951,41 @@ namespace Mirror
         /// <para>We pass dirtyComponentsMask into this function so that we can check if any Components are dirty before creating writers</para>
         /// </summary>
         /// <param name="initialState"></param>
-        /// <param name="dirtyComponentsMask"></param>
         /// <param name="ownerWriter"></param>
         /// <param name="ownerWritten"></param>
         /// <param name="observersWriter"></param>
         /// <param name="observersWritten"></param>
-        internal void OnSerializeAllSafely(bool initialState, ulong dirtyComponentsMask, NetworkWriter ownerWriter, out int ownerWritten, NetworkWriter observersWriter, out int observersWritten)
+        internal void OnSerializeAllSafely(bool initialState, NetworkWriter ownerWriter, out int ownerWritten, NetworkWriter observersWriter, out int observersWritten)
         {
             // clear 'written' variables
             ownerWritten = observersWritten = 0;
 
-            // dirtyComponentsMask should be changed before tyhis function is called
-            Debug.Assert(dirtyComponentsMask != 0UL, "OnSerializeAllSafely Should not be given a zero dirtyComponentsMask", this);
+            // check if components are in byte.MaxRange just to be 100% sure
+            // that we avoid overflows
+            NetworkBehaviour[] components = NetworkBehaviours;
+            if (components.Length > byte.MaxValue)
+                throw new IndexOutOfRangeException($"{name} has more than {byte.MaxValue} components. This is not supported.");
 
-            // calculate syncMode mask at runtime. this allows users to change
-            // component.syncMode while the game is running, which can be a huge
-            // advantage over syncvar-based sync modes. e.g. if a player decides
-            // to share or not share his inventory, or to go invisible, etc.
-            //
-            // (this also lets the TestSynchronizingObjects test pass because
-            //  otherwise if we were to cache it in Awake, then we would call
-            //  GetComponents<NetworkBehaviour> before all the test behaviours
-            //  were added)
-            ulong syncModeObserversMask = GetSyncModeObserversMask();
-
-            // write regular dirty mask for owner,
-            // writer 'dirty mask & syncMode==Everyone' for everyone else
-            // (WritePacked64 so we don't write full 8 bytes if we don't have to)
-            ownerWriter.WritePackedUInt64(dirtyComponentsMask);
-            observersWriter.WritePackedUInt64(dirtyComponentsMask & syncModeObserversMask);
-
-            foreach (NetworkBehaviour comp in NetworkBehaviours)
+            // serialize all components
+            for (int i = 0; i < components.Length; ++i)
             {
                 // is this component dirty?
                 // -> always serialize if initialState so all components are included in spawn packet
                 // -> note: IsDirty() is false if the component isn't dirty or sendInterval isn't elapsed yet
+                NetworkBehaviour comp = components[i];
                 if (initialState || comp.IsDirty())
                 {
                     if (logger.LogEnabled()) logger.Log("OnSerializeAllSafely: " + name + " -> " + comp.GetType() + " initial=" + initialState);
 
+                    // remember start position in case we need to copy it into
+                    // observers writer too
+                    int startPosition = ownerWriter.Position;
+
+                    // write index as byte [0..255]
+                    ownerWriter.WriteByte((byte)i);
+
                     // serialize into ownerWriter first
                     // (owner always gets everything!)
-                    int startPosition = ownerWriter.Position;
                     OnSerializeSafely(comp, ownerWriter, initialState);
                     ++ownerWritten;
 
@@ -1014,55 +1009,6 @@ namespace Mirror
             }
         }
 
-        internal ulong GetDirtyComponentsMask()
-        {
-            // loop through all components only once and then write dirty+payload into the writer afterwards
-            ulong dirtyComponentsMask = 0L;
-            NetworkBehaviour[] components = NetworkBehaviours;
-            for (int i = 0; i < components.Length; ++i)
-            {
-                NetworkBehaviour comp = components[i];
-                if (comp.IsDirty())
-                {
-                    dirtyComponentsMask |= 1UL << i;
-                }
-            }
-
-            return dirtyComponentsMask;
-        }
-        internal ulong GetInitialComponentsMask()
-        {
-            // loop through all components only once and then write dirty+payload into the writer afterwards
-            ulong dirtyComponentsMask = 0UL;
-            for (int i = 0; i < NetworkBehaviours.Length; ++i)
-            {
-                dirtyComponentsMask |= 1UL << i;
-            }
-
-            return dirtyComponentsMask;
-        }
-
-
-        /// <summary>
-        /// a mask that contains all the components with SyncMode.Observers
-        /// </summary>
-        /// <returns></returns>
-        internal ulong GetSyncModeObserversMask()
-        {
-            // loop through all components
-            ulong mask = 0UL;
-            NetworkBehaviour[] components = NetworkBehaviours;
-            for (int i = 0; i < NetworkBehaviours.Length; ++i)
-            {
-                NetworkBehaviour comp = components[i];
-                if (comp.syncMode == SyncMode.Observers)
-                {
-                    mask |= 1UL << i;
-                }
-            }
-
-            return mask;
-        }
 
         void OnDeserializeSafely(NetworkBehaviour comp, NetworkReader reader, bool initialState)
         {
@@ -1104,18 +1050,16 @@ namespace Mirror
 
         internal void OnDeserializeAllSafely(NetworkReader reader, bool initialState)
         {
-            // read component dirty mask
-            ulong dirtyComponentsMask = reader.ReadPackedUInt64();
-
+            // deserialize all components that were received
             NetworkBehaviour[] components = NetworkBehaviours;
-            // loop through all components and deserialize the dirty ones
-            for (int i = 0; i < components.Length; ++i)
+            while (reader.Position < reader.Length)
             {
-                // is the dirty bit at position 'i' set to 1?
-                ulong dirtyBit = 1UL << i;
-                if ((dirtyComponentsMask & dirtyBit) != 0L)
+                // read & check index [0..255]
+                byte index = reader.ReadByte();
+                if (index < components.Length)
                 {
-                    OnDeserializeSafely(components[i], reader, initialState);
+                    // deserialize this component
+                    OnDeserializeSafely(components[index], reader, initialState);
                 }
             }
         }
@@ -1481,13 +1425,7 @@ namespace Mirror
         {
             if (observers != null && observers.Count > 0)
             {
-                ulong dirtyComponentsMask = GetDirtyComponentsMask();
-
-                // AnyComponentsDirty
-                if (dirtyComponentsMask != 0UL)
-                {
-                    SendUpdateVarsMessage(dirtyComponentsMask);
-                }
+                SendUpdateVarsMessage();
             }
             else
             {
@@ -1497,13 +1435,13 @@ namespace Mirror
             }
         }
 
-        void SendUpdateVarsMessage(ulong dirtyComponentsMask)
+        void SendUpdateVarsMessage()
         {
             // one writer for owner, one for observers
             using (PooledNetworkWriter ownerWriter = NetworkWriterPool.GetWriter(), observersWriter = NetworkWriterPool.GetWriter())
             {
                 // serialize all the dirty components and send
-                OnSerializeAllSafely(false, dirtyComponentsMask, ownerWriter, out int ownerWritten, observersWriter, out int observersWritten);
+                OnSerializeAllSafely(false, ownerWriter, out int ownerWritten, observersWriter, out int observersWritten);
                 if (ownerWritten > 0 || observersWritten > 0)
                 {
                     UpdateVarsMessage varsMessage = new UpdateVarsMessage

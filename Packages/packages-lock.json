@@ -1,5 +1,6 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -30,11 +31,16 @@
     },
     "com.unity.ide.vscode": {
       "version": "1.2.1",
+=======
+    "com.unity.package-manager-ui": {
+      "version": "2.0.13",
+>>>>>>> upstream/master
       "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+<<<<<<< HEAD
     "com.unity.multiplayer-hlapi": {
       "version": "1.0.6",
       "depth": 0,
@@ -83,11 +89,16 @@
     },
     "com.unity.xr.legacyinputhelpers": {
       "version": "2.1.4",
+=======
+    "com.unity.test-framework.performance": {
+      "version": "0.1.50-preview",
+>>>>>>> upstream/master
       "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+<<<<<<< HEAD
     "com.vis2k.telepathy": {
       "version": "https://github.com/VoltUnityPackages/Telepathy.git?path=/src",
       "depth": 0,
@@ -98,6 +109,11 @@
     "nuget.mono-cecil": {
       "version": "0.1.6-preview",
       "depth": 1,
+=======
+    "com.unity.textmeshpro": {
+      "version": "1.4.1",
+      "depth": 0,
+>>>>>>> upstream/master
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -108,12 +124,15 @@
       "source": "builtin",
       "dependencies": {}
     },
+<<<<<<< HEAD
     "com.unity.modules.androidjni": {
       "version": "1.0.0",
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
     },
+=======
+>>>>>>> upstream/master
     "com.unity.modules.animation": {
       "version": "1.0.0",
       "depth": 0,
@@ -235,6 +254,21 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {
+<<<<<<< HEAD
+=======
+        "com.unity.modules.ui": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0",
+        "com.unity.modules.uielementsnative": "1.0.0"
+      }
+    },
+    "com.unity.modules.uielementsnative": {
+      "version": "1.0.0",
+      "depth": 1,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.modules.ui": "1.0.0",
+>>>>>>> upstream/master
         "com.unity.modules.imgui": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
       }
