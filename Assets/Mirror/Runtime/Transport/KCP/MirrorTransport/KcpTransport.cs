@@ -84,11 +84,17 @@ namespace kcp2k
         {
             client.Connect(address, Port, NoDelay, Interval, FastResend, CongestionWindow, SendWindowSize, ReceiveWindowSize);
         }
+
         public override void ClientSend(int channelId, ArraySegment<byte> segment)
         {
             client.Send(segment);
         }
         public override void ClientDisconnect() => client.Disconnect();
+
+        public override int GetConnectionRtt(uint connectionId)
+        {
+            throw new NotImplementedException();
+        }
 
         // IMPORTANT: set script execution order to >1000 to call Transport's
         //            LateUpdate after all others. Fixes race condition where
