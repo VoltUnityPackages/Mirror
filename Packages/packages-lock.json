@@ -50,6 +50,13 @@
       "dependencies": {},
       "hash": "c65283046a817aa688a3d390494bbe5f31fb2fff"
     },
+    "nuget.mono-cecil": {
+      "version": "0.1.6-preview",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.modules.animation": {
       "version": "1.0.0",
       "depth": 0,

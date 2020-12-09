@@ -10,6 +10,9 @@
     "url": "https://github.com/VoltUnityPackages/Mirror.git"
   },
   "type": "library",
+  "dependencies": {
+    "nuget.mono-cecil": "0.1.6-preview"
+  },
   "testables": [ "com.unity.test-framework", "com.unity.ext.nunit" ],
   "samples": [
     {
