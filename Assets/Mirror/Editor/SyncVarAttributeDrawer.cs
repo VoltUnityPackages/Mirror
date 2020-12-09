@@ -1,7 +1,7 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEngine;
 
-namespace Mirror
+namespace Mirror.Editor
 {
     [CustomPropertyDrawer(typeof(SyncVarAttribute))]
     public class SyncVarAttributeDrawer : PropertyDrawer
@@ -25,4 +25,4 @@ namespace Mirror
             return EditorGUI.GetPropertyHeight(property);
         }
     }
-} //namespace
+}

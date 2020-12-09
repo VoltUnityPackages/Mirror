@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Mono.Cecil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     public static class SyncObjectProcessor
     {
@@ -21,7 +21,7 @@ namespace Mirror.Weaver
                 {
                     if (fd.IsStatic)
                     {
-                        Weaver.Error($"{fd.Name} cannot be static", fd);
+                        Editor.Weaver.Weaver.Error($"{fd.Name} cannot be static", fd);
                         continue;
                     }
 

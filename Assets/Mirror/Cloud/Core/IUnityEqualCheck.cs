@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Mirror.Cloud
+namespace Mirror.Cloud.Core
 {
     /// <summary>
     /// Adds Extension to check if unity object is null.

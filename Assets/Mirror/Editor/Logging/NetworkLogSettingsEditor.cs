@@ -1,10 +1,10 @@
 using Mirror.Logging;
 using UnityEditor;
 
-namespace Mirror.EditorScripts.Logging
+namespace Mirror.Editor.Logging
 {
     [CustomEditor(typeof(NetworkLogSettings))]
-    public class NetworkLogSettingsEditor : Editor
+    public class NetworkLogSettingsEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

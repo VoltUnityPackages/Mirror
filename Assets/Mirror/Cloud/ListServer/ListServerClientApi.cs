@@ -1,9 +1,10 @@
 using System.Collections;
+using Mirror.Cloud.Core;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 
-namespace Mirror.Cloud.ListServerService
+namespace Mirror.Cloud.ListServer
 {
     public sealed class ListServerClientApi : ListServerBaseApi, IListServerClientApi
     {

@@ -4,9 +4,10 @@
 //       value for null otherwise.
 //       (original FieldType.Resolve returns null if not found too, so
 //        exceptions would be a bit inconsistent here)
+
 using Mono.Cecil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     public static class Resolvers
     {
@@ -14,13 +15,13 @@ namespace Mirror.Weaver
         {
             if (tr == null)
             {
-                Weaver.Error($"Cannot resolve method {name} without a class");
+                Editor.Weaver.Weaver.Error($"Cannot resolve method {name} without a class");
                 return null;
             }
             MethodReference method = ResolveMethod(tr, scriptDef, m => m.Name == name);
             if (method == null)
             {
-                Weaver.Error($"Method not found with name {name} in type {tr.Name}", tr);
+                Editor.Weaver.Weaver.Error($"Method not found with name {name} in type {tr.Name}", tr);
             }
             return method;
         }
@@ -35,7 +36,7 @@ namespace Mirror.Weaver
                 }
             }
 
-            Weaver.Error($"Method not found in type {t.Name}", t);
+            Editor.Weaver.Weaver.Error($"Method not found in type {t.Name}", t);
             return null;
         }
 

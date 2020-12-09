@@ -1,7 +1,7 @@
 using System;
 using Mono.Cecil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     public static class WeaverTypes
     {

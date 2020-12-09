@@ -7,12 +7,12 @@ using UnityEditor.Compilation;
 using UnityEngine;
 using UnityAssembly = UnityEditor.Compilation.Assembly;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     public static class CompilationFinishedHook
     {
         const string MirrorRuntimeAssemblyName = "Mirror";
-        const string MirrorWeaverAssemblyName = "Mirror.Weaver";
+        const string MirrorWeaverAssemblyName = "Mirror.Editor.Weaver";
 
         // delegate for subscription to Weaver debug messages
         public static Action<string> OnWeaverMessage;
@@ -143,7 +143,7 @@ namespace Mirror.Weaver
             Log.WarningMethod = HandleWarning;
             Log.ErrorMethod = HandleError;
 
-            if (!Weaver.WeaveAssembly(assemblyPath, dependencyPaths.ToArray()))
+            if (!Editor.Weaver.Weaver.WeaveAssembly(assemblyPath, dependencyPaths.ToArray()))
             {
                 // Set false...will be checked in \Editor\EnterPlayModeSettingsCheck.CheckSuccessfulWeave()
                 SessionState.SetBool("MIRROR_WEAVE_SUCCESS", false);

@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using Mirror.Editor.Weaver;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using NUnit.Framework;

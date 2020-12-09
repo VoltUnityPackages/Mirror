@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     static class Helpers
     {

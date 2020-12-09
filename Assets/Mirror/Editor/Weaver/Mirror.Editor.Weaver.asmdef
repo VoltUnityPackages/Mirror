@@ -1,9 +1,8 @@
 {
-    "name": "Mirror.Weaver",
+    "name": "Mirror.Editor.Weaver",
     "references": [
         "Mirror"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -11,11 +10,13 @@
     "allowUnsafeCode": true,
     "overrideReferences": true,
     "precompiledReferences": [
-      "Mono.Cecil.dll",
-      "Mono.Cecil.Rocks.dll",
-      "Mono.Cecil.Mdb.dll",
-      "Mono.Cecil.Pdb.dll"
+        "Mono.Cecil.dll",
+        "Mono.Cecil.Rocks.dll",
+        "Mono.Cecil.Mdb.dll",
+        "Mono.Cecil.Pdb.dll"
     ],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

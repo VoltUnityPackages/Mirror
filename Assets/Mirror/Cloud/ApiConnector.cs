@@ -1,4 +1,5 @@
-using Mirror.Cloud.ListServerService;
+using Mirror.Cloud.Core;
+using Mirror.Cloud.ListServer;
 using UnityEngine;
 
 namespace Mirror.Cloud
@@ -8,7 +9,7 @@ namespace Mirror.Cloud
     /// </summary>
     public interface IApiConnector
     {
-        ListServer ListServer { get; }
+        ListServer.ListServer ListServer { get; }
     }
 
     /// <summary>
@@ -36,7 +37,7 @@ namespace Mirror.Cloud
 
         IRequestCreator requestCreator;
 
-        public ListServer ListServer { get; private set; }
+        public ListServer.ListServer ListServer { get; private set; }
 
         void Awake()
         {
@@ -49,7 +50,7 @@ namespace Mirror.Cloud
         {
             IListServerServerApi serverApi = new ListServerServerApi(this, requestCreator);
             IListServerClientApi clientApi = new ListServerClientApi(this, requestCreator, _onServerListUpdated);
-            ListServer = new ListServer(serverApi, clientApi);
+            ListServer = new ListServer.ListServer(serverApi, clientApi);
         }
 
         public void OnDestroy()

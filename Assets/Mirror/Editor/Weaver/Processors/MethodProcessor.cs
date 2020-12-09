@@ -1,7 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     public static class MethodProcessor
     {
@@ -90,19 +90,19 @@ namespace Mirror.Weaver
 
                     if (baseMethod == null)
                     {
-                        Weaver.Error($"Could not find base method for {callName}", method);
+                        Editor.Weaver.Weaver.Error($"Could not find base method for {callName}", method);
                         return;
                     }
 
                     if (!baseMethod.IsVirtual)
                     {
-                        Weaver.Error($"Could not find base method that was virutal {callName}", method);
+                        Editor.Weaver.Weaver.Error($"Could not find base method that was virutal {callName}", method);
                         return;
                     }
 
                     instruction.Operand = baseMethod;
 
-                    Weaver.DLog(type, "Replacing call to '{0}' with '{1}' inside '{2}'", calledMethod.FullName, baseMethod.FullName, method.FullName);
+                    Editor.Weaver.Weaver.DLog(type, "Replacing call to '{0}' with '{1}' inside '{2}'", calledMethod.FullName, baseMethod.FullName, method.FullName);
                 }
             }
         }

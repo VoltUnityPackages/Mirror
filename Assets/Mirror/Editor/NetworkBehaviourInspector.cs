@@ -5,11 +5,11 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Mirror
+namespace Mirror.Editor
 {
     [CustomEditor(typeof(NetworkBehaviour), true)]
     [CanEditMultipleObjects]
-    public class NetworkBehaviourInspector : Editor
+    public class NetworkBehaviourInspector : UnityEditor.Editor
     {
         /// <summary>
         /// List of all visible syncVars in target class

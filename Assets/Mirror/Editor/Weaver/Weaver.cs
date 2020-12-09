@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Mirror.Editor.Weaver.Processors;
 using Mono.Cecil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     // This data is flushed each time - if we are run multiple times in the same process/domain
     class WeaverLists

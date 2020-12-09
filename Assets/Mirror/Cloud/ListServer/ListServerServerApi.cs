@@ -1,8 +1,10 @@
 using System.Collections;
+using Mirror.Cloud.Core;
 using UnityEngine;
 using UnityEngine.Networking;
+using Logger = Mirror.Cloud.Core.Logger;
 
-namespace Mirror.Cloud.ListServerService
+namespace Mirror.Cloud.ListServer
 {
     public sealed class ListServerServerApi : ListServerBaseApi, IListServerServerApi
     {

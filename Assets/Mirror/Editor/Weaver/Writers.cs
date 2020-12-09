@@ -4,7 +4,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     public static class Writers
     {
@@ -145,7 +145,7 @@ namespace Mirror.Weaver
 
             ILProcessor worker = writerFunc.Body.GetILProcessor();
 
-            MethodReference underlyingWriter = GetWriteFunc(variable.Resolve().GetEnumUnderlyingType());
+            MethodReference underlyingWriter = GetWriteFunc(Extensions.GetEnumUnderlyingType(variable.Resolve()));
 
             worker.Append(worker.Create(OpCodes.Ldarg_0));
             worker.Append(worker.Create(OpCodes.Ldarg_1));

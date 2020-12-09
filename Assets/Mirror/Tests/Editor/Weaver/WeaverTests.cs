@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mirror.Editor.Weaver;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;

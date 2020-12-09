@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace Mirror
+namespace Mirror.Editor
 {
     public static class InspectorHelper
     {

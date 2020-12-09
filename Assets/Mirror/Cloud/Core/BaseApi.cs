@@ -1,6 +1,6 @@
 using System;
 
-namespace Mirror.Cloud
+namespace Mirror.Cloud.Core
 {
     public interface IBaseApi
     {

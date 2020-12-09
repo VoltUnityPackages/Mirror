@@ -2,9 +2,8 @@
     "name": "Mirror.Editor",
     "references": [
         "Mirror",
-        "Mirror.Weaver"
+        "Mirror.Editor.Weaver"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -13,5 +12,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

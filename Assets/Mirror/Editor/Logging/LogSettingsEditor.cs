@@ -2,10 +2,10 @@ using Mirror.Logging;
 using UnityEditor;
 using UnityEngine;
 
-namespace Mirror.EditorScripts.Logging
+namespace Mirror.Editor.Logging
 {
     [CustomEditor(typeof(LogSettings))]
-    public class LogSettingsEditor : Editor
+    public class LogSettingsEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mirror.Cloud.Core;
 
-namespace Mirror.Cloud.ListServerService
+namespace Mirror.Cloud.ListServer
 {
     [Serializable]
     public struct ServerCollectionJson : ICanBeJson

@@ -2,7 +2,7 @@ using System;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     public static class PropertySiteProcessor
     {
@@ -43,7 +43,7 @@ namespace Mirror.Weaver
 
             if (md.Name == ".cctor" ||
                 md.Name == NetworkBehaviourProcessor.ProcessedFunctionName ||
-                md.Name.StartsWith(Weaver.InvokeRpcPrefix))
+                md.Name.StartsWith(Editor.Weaver.Weaver.InvokeRpcPrefix))
                 return;
 
             if (md.IsAbstract)
@@ -69,7 +69,7 @@ namespace Mirror.Weaver
                 return;
 
             // does it set a field that we replaced?
-            if (Weaver.WeaveLists.replacementSetterProperties.TryGetValue(opField, out MethodDefinition replacement))
+            if (Editor.Weaver.Weaver.WeaveLists.replacementSetterProperties.TryGetValue(opField, out MethodDefinition replacement))
             {
                 //replace with property
                 //DLog(td, "    replacing "  + md.Name + ":" + i);
@@ -87,7 +87,7 @@ namespace Mirror.Weaver
                 return;
 
             // does it set a field that we replaced?
-            if (Weaver.WeaveLists.replacementGetterProperties.TryGetValue(opField, out MethodDefinition replacement))
+            if (Editor.Weaver.Weaver.WeaveLists.replacementGetterProperties.TryGetValue(opField, out MethodDefinition replacement))
             {
                 //replace with property
                 //DLog(td, "    replacing "  + md.Name + ":" + i);
@@ -128,7 +128,7 @@ namespace Mirror.Weaver
                 return 1;
 
             // does it set a field that we replaced?
-            if (Weaver.WeaveLists.replacementSetterProperties.TryGetValue(opField, out MethodDefinition replacement))
+            if (Editor.Weaver.Weaver.WeaveLists.replacementSetterProperties.TryGetValue(opField, out MethodDefinition replacement))
             {
                 // we have a replacement for this property
                 // is the next instruction a initobj?

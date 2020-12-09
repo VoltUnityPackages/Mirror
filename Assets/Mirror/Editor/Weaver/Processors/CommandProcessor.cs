@@ -1,7 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     /// <summary>
     /// Processes [Command] methods in NetworkBehaviour
@@ -83,7 +83,7 @@ namespace Mirror.Weaver
         */
         public static MethodDefinition ProcessCommandInvoke(TypeDefinition td, MethodDefinition method, MethodDefinition cmdCallFunc)
         {
-            MethodDefinition cmd = new MethodDefinition(Weaver.InvokeRpcPrefix + method.Name,
+            MethodDefinition cmd = new MethodDefinition(Editor.Weaver.Weaver.InvokeRpcPrefix + method.Name,
                 MethodAttributes.Family | MethodAttributes.Static | MethodAttributes.HideBySig,
                 WeaverTypes.Import(typeof(void)));
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     public static class Log
     {

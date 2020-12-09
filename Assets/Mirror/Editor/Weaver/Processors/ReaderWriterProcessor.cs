@@ -1,4 +1,5 @@
 // finds all readers and writers and register them
+
 using System;
 using System.Linq;
 using Mono.Cecil;
@@ -7,7 +8,7 @@ using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     public static class ReaderWriterProcessor
     {
@@ -167,7 +168,7 @@ namespace Mirror.Weaver
 
             worker.Append(worker.Create(OpCodes.Ret));
 
-            TypeDefinition generateClass = Weaver.WeaveLists.generateContainerClass;
+            TypeDefinition generateClass = Editor.Weaver.Weaver.WeaveLists.generateContainerClass;
 
             generateClass.Methods.Add(rwInitializer);
         }

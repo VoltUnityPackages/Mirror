@@ -3,7 +3,7 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     /// <summary>
     /// Processes [SyncVar] in NetworkBehaviour
@@ -41,8 +41,8 @@ namespace Mirror.Weaver
 
             if (methodsWith2Param.Count == 0)
             {
-                Weaver.Error($"Could not find hook for '{syncVar.Name}', hook name '{hookFunctionName}'. " +
-                    $"Method signature should be {HookParameterMessage(hookFunctionName, syncVar.FieldType)}",
+                Editor.Weaver.Weaver.Error($"Could not find hook for '{syncVar.Name}', hook name '{hookFunctionName}'. " +
+                                           $"Method signature should be {HookParameterMessage(hookFunctionName, syncVar.FieldType)}",
                     syncVar);
 
                 return null;
@@ -56,8 +56,8 @@ namespace Mirror.Weaver
                 }
             }
 
-            Weaver.Error($"Wrong type for Parameter in hook for '{syncVar.Name}', hook name '{hookFunctionName}'. " +
-                     $"Method signature should be {HookParameterMessage(hookFunctionName, syncVar.FieldType)}",
+            Editor.Weaver.Weaver.Error($"Wrong type for Parameter in hook for '{syncVar.Name}', hook name '{hookFunctionName}'. " +
+                                       $"Method signature should be {HookParameterMessage(hookFunctionName, syncVar.FieldType)}",
                    syncVar);
 
             return null;
@@ -262,7 +262,7 @@ namespace Mirror.Weaver
         public static void ProcessSyncVar(TypeDefinition td, FieldDefinition fd, Dictionary<FieldDefinition, FieldDefinition> syncVarNetIds, long dirtyBit)
         {
             string originalName = fd.Name;
-            Weaver.DLog(td, "Sync Var " + fd.Name + " " + fd.FieldType);
+            Editor.Weaver.Weaver.DLog(td, "Sync Var " + fd.Name + " " + fd.FieldType);
 
             // GameObject/NetworkIdentity SyncVars have a new field for netId
             FieldDefinition netIdField = null;
@@ -290,7 +290,7 @@ namespace Mirror.Weaver
             td.Methods.Add(get);
             td.Methods.Add(set);
             td.Properties.Add(propertyDefinition);
-            Weaver.WeaveLists.replacementSetterProperties[fd] = set;
+            Editor.Weaver.Weaver.WeaveLists.replacementSetterProperties[fd] = set;
 
             // replace getter field if GameObject/NetworkIdentity so it uses
             // netId instead
@@ -298,7 +298,7 @@ namespace Mirror.Weaver
             //    end up in recursion.
             if (fd.FieldType.IsNetworkIdentityField())
             {
-                Weaver.WeaveLists.replacementGetterProperties[fd] = get;
+                Editor.Weaver.Weaver.WeaveLists.replacementGetterProperties[fd] = get;
             }
         }
 
@@ -309,7 +309,7 @@ namespace Mirror.Weaver
 
             // the mapping of dirtybits to sync-vars is implicit in the order of the fields here. this order is recorded in m_replacementProperties.
             // start assigning syncvars at the place the base class stopped, if any
-            int dirtyBitCounter = Weaver.WeaveLists.GetSyncVarStart(td.BaseType.FullName);
+            int dirtyBitCounter = Editor.Weaver.Weaver.WeaveLists.GetSyncVarStart(td.BaseType.FullName);
 
             // find syncvars
             foreach (FieldDefinition fd in td.Fields)
@@ -318,19 +318,19 @@ namespace Mirror.Weaver
                 {
                     if ((fd.Attributes & FieldAttributes.Static) != 0)
                     {
-                        Weaver.Error($"{fd.Name} cannot be static", fd);
+                        Editor.Weaver.Weaver.Error($"{fd.Name} cannot be static", fd);
                         continue;
                     }
 
                     if (fd.FieldType.IsArray)
                     {
-                        Weaver.Error($"{fd.Name} has invalid type. Use SyncLists instead of arrays", fd);
+                        Editor.Weaver.Weaver.Error($"{fd.Name} has invalid type. Use SyncLists instead of arrays", fd);
                         continue;
                     }
 
                     if (SyncObjectInitializer.ImplementsSyncObject(fd.FieldType))
                     {
-                        Weaver.Warning($"{fd.Name} has [SyncVar] attribute. SyncLists should not be marked with SyncVar", fd);
+                        Editor.Weaver.Weaver.Warning($"{fd.Name} has [SyncVar] attribute. SyncLists should not be marked with SyncVar", fd);
                     }
                     else
                     {
@@ -341,7 +341,7 @@ namespace Mirror.Weaver
 
                         if (dirtyBitCounter == SyncVarLimit)
                         {
-                            Weaver.Error($"{td.Name} has too many SyncVars. Consider refactoring your class into multiple components", td);
+                            Editor.Weaver.Weaver.Error($"{td.Name} has too many SyncVars. Consider refactoring your class into multiple components", td);
                             continue;
                         }
                     }
@@ -353,7 +353,7 @@ namespace Mirror.Weaver
             {
                 td.Fields.Add(fd);
             }
-            Weaver.WeaveLists.SetNumSyncVars(td.FullName, syncVars.Count);
+            Editor.Weaver.Weaver.WeaveLists.SetNumSyncVars(td.FullName, syncVars.Count);
 
             return (syncVars, syncVarNetIds);
         }
@@ -367,7 +367,7 @@ namespace Mirror.Weaver
         {
             if (newValue == null)
             {
-                Weaver.Error("NewValue field was null when writing SyncVar hook");
+                Editor.Weaver.Weaver.Error("NewValue field was null when writing SyncVar hook");
             }
 
             WriteCallHookMethod(worker, hookMethod, oldValue, newValue);

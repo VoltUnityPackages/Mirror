@@ -1,6 +1,6 @@
 using Mono.Cecil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     /// <summary>
     /// only shows warnings in case we use SyncVars etc. for MonoBehaviour.
@@ -19,11 +19,11 @@ namespace Mirror.Weaver
             foreach (FieldDefinition fd in td.Fields)
             {
                 if (fd.HasCustomAttribute<SyncVarAttribute>())
-                    Weaver.Error($"SyncVar {fd.Name} must be inside a NetworkBehaviour.  {td.Name} is not a NetworkBehaviour", fd);
+                    Editor.Weaver.Weaver.Error($"SyncVar {fd.Name} must be inside a NetworkBehaviour.  {td.Name} is not a NetworkBehaviour", fd);
 
                 if (SyncObjectInitializer.ImplementsSyncObject(fd.FieldType))
                 {
-                    Weaver.Error($"{fd.Name} is a SyncObject and must be inside a NetworkBehaviour.  {td.Name} is not a NetworkBehaviour", fd);
+                    Editor.Weaver.Weaver.Error($"{fd.Name} is a SyncObject and must be inside a NetworkBehaviour.  {td.Name} is not a NetworkBehaviour", fd);
                 }
             }
         }
@@ -34,11 +34,11 @@ namespace Mirror.Weaver
             foreach (MethodDefinition md in td.Methods)
             {
                 if (md.HasCustomAttribute<CommandAttribute>())
-                    Weaver.Error($"Command {md.Name} must be declared inside a NetworkBehaviour", md);
+                    Editor.Weaver.Weaver.Error($"Command {md.Name} must be declared inside a NetworkBehaviour", md);
                 if (md.HasCustomAttribute<ClientRpcAttribute>())
-                    Weaver.Error($"ClientRpc {md.Name} must be declared inside a NetworkBehaviour", md);
+                    Editor.Weaver.Weaver.Error($"ClientRpc {md.Name} must be declared inside a NetworkBehaviour", md);
                 if (md.HasCustomAttribute<TargetRpcAttribute>())
-                    Weaver.Error($"TargetRpc {md.Name} must be declared inside a NetworkBehaviour", md);
+                    Editor.Weaver.Weaver.Error($"TargetRpc {md.Name} must be declared inside a NetworkBehaviour", md);
             }
         }
     }

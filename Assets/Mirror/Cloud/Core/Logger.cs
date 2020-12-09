@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Mirror.Cloud
+namespace Mirror.Cloud.Core
 {
     public static class Logger
     {

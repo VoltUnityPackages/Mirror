@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver
 {
     public static class Extensions
     {
@@ -145,7 +145,7 @@ namespace Mirror.Weaver
             foreach (GenericParameter generic_parameter in self.GenericParameters)
                 reference.GenericParameters.Add(new GenericParameter(generic_parameter.Name, reference));
 
-            return Weaver.CurrentAssembly.MainModule.ImportReference(reference);
+            return Editor.Weaver.Weaver.CurrentAssembly.MainModule.ImportReference(reference);
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace Mirror.Weaver
         {
             FieldReference reference = new FieldReference(self.Name, self.FieldType, instanceType);
 
-            return Weaver.CurrentAssembly.MainModule.ImportReference(reference);
+            return Editor.Weaver.Weaver.CurrentAssembly.MainModule.ImportReference(reference);
         }
 
         public static CustomAttribute GetCustomAttribute<TAttribute>(this ICustomAttributeProvider method)

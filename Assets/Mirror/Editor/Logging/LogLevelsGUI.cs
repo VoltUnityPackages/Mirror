@@ -3,7 +3,7 @@ using Mirror.Logging;
 using UnityEditor;
 using UnityEngine;
 
-namespace Mirror.EditorScripts.Logging
+namespace Mirror.Editor.Logging
 {
     public static class LogLevelsGUI
     {

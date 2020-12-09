@@ -1,7 +1,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     /// <summary>
     /// Processes [Rpc] methods in NetworkBehaviour
@@ -11,7 +11,7 @@ namespace Mirror.Weaver
         public static MethodDefinition ProcessRpcInvoke(TypeDefinition td, MethodDefinition md, MethodDefinition rpcCallFunc)
         {
             MethodDefinition rpc = new MethodDefinition(
-                Weaver.InvokeRpcPrefix + md.Name,
+                Editor.Weaver.Weaver.InvokeRpcPrefix + md.Name,
                 MethodAttributes.Family | MethodAttributes.Static | MethodAttributes.HideBySig,
                 WeaverTypes.Import(typeof(void)));
 
@@ -66,7 +66,7 @@ namespace Mirror.Weaver
 
             NetworkBehaviourProcessor.WriteSetupLocals(worker);
 
-            if (Weaver.GenerateLogErrors)
+            if (Editor.Weaver.Weaver.GenerateLogErrors)
             {
                 worker.Append(worker.Create(OpCodes.Ldstr, "Call ClientRpc function " + md.Name));
                 worker.Append(worker.Create(OpCodes.Call, WeaverTypes.logErrorReference));

@@ -1,8 +1,9 @@
 // Injects server/client active checks for [Server/Client] attributes
+
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Mirror.Weaver
+namespace Mirror.Editor.Weaver.Processors
 {
     static class ServerClientAttributeProcessor
     {
@@ -25,14 +26,14 @@ namespace Mirror.Weaver
         {
             if (md.Name == ".cctor" ||
                 md.Name == NetworkBehaviourProcessor.ProcessedFunctionName ||
-                md.Name.StartsWith(Weaver.InvokeRpcPrefix))
+                md.Name.StartsWith(Editor.Weaver.Weaver.InvokeRpcPrefix))
                 return false;
 
             if (md.IsAbstract)
             {
                 if (HasServerClientAttribute(md))
                 {
-                    Weaver.Error("Server or Client Attributes can't be added to abstract method. Server and Client Attributes are not inherited so they need to be applied to the override methods instead.", md);
+                    Editor.Weaver.Weaver.Error("Server or Client Attributes can't be added to abstract method. Server and Client Attributes are not inherited so they need to be applied to the override methods instead.", md);
                 }
                 return false;
             }

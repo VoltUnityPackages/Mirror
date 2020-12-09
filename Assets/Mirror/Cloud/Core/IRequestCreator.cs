@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine.Networking;
 
-namespace Mirror.Cloud
+namespace Mirror.Cloud.Core
 {
     public delegate void RequestSuccess(string responseBody);
 

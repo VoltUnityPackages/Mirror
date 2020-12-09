@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Mirror.EditorScripts
+namespace Mirror.Editor
 {
     public static class ScriptableObjectUtility
     {
