@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
-using kcp2k;
 
 namespace Mirror
 {
@@ -205,7 +204,7 @@ namespace Mirror
                 transport = GetComponent<Transport>();
                 if (transport == null)
                 {
-                    transport = gameObject.AddComponent<KcpTransport>();
+                    transport = gameObject.AddComponent<NullTransport>();
                     logger.Log("NetworkManager: added default Transport because there was none yet.");
                 }
 #if UNITY_EDITOR
