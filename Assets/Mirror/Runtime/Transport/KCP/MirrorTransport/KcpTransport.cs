@@ -91,11 +91,6 @@ namespace kcp2k
         }
         public override void ClientDisconnect() => client.Disconnect();
 
-        public override int GetConnectionRtt(uint connectionId)
-        {
-            throw new NotImplementedException();
-        }
-
         // IMPORTANT: set script execution order to >1000 to call Transport's
         //            LateUpdate after all others. Fixes race condition where
         //            e.g. in uSurvival Transport would apply Cmds before

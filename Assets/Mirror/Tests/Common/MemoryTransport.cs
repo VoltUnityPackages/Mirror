@@ -80,11 +80,6 @@ namespace Mirror.Tests
             }
         }
 
-        public override int GetConnectionRtt(uint connectionId)
-        {
-            return 0;
-        }
-
         void ProcessClientMessages()
         {
             // note: process even if not connected because when calling

@@ -34,11 +34,6 @@ public class NullTransport : Transport
         throw new NotImplementedException();
     }
 
-    public override int GetConnectionRtt(uint connectionId)
-    {
-        throw new NotImplementedException();
-    }
-
     public override Uri ServerUri()
     {
         throw new NotImplementedException();

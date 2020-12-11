@@ -120,13 +120,6 @@ namespace Mirror
         #region Server
 
         /// <summary>
-        /// Gets a connection's rtt
-        /// </summary>
-        /// <param name="connectionId"></param>
-        /// <returns></returns>
-        public abstract int GetConnectionRtt(uint connectionId);
-
-        /// <summary>
         /// Retrieves the address of this server.
         /// Useful for network discovery
         /// </summary>
