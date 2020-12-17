@@ -306,6 +306,43 @@ namespace Mirror
             return null;
         }
 
+        public static NetworkBehaviour ReadNetworkBehaviour(this NetworkReader reader)
+        {
+            uint netId = reader.ReadUInt32();
+            if (netId == 0)
+                return null;
+
+            // if netId is not 0, then index is also sent to read before returning
+            byte componentIndex = reader.ReadByte();
+
+            if (!NetworkIdentity.spawned.TryGetValue(netId, out NetworkIdentity identity))
+            {
+                if (logger.WarnEnabled()) logger.LogFormat(LogType.Warning, "ReadNetworkBehaviour netId:{0} not found in spawned", netId);
+                return null;
+            }
+
+            return identity.NetworkBehaviours[componentIndex];
+        }
+
+        public static T ReadNetworkBehaviour<T>(this NetworkReader reader) where T : NetworkBehaviour
+        {
+            return reader.ReadNetworkBehaviour() as T;
+        }
+
+        public static NetworkBehaviour.NetworkBehaviourSyncVar ReadNetworkBehaviourSyncVar(this NetworkReader reader)
+        {
+            uint netId = reader.ReadUInt32();
+            byte componentIndex = default;
+
+            // if netId is not 0, then index is also sent to read before returning
+            if (netId != 0)
+            {
+                componentIndex = reader.ReadByte();
+            }
+
+            return new NetworkBehaviour.NetworkBehaviourSyncVar(netId, componentIndex);
+        }
+
         public static List<T> ReadList<T>(this NetworkReader reader)
         {
             int length = reader.ReadInt32();
@@ -322,8 +359,21 @@ namespace Mirror
         public static T[] ReadArray<T>(this NetworkReader reader)
         {
             int length = reader.ReadInt32();
+
+            //  we write -1 for null
             if (length < 0)
                 return null;
+            
+            // todo throw an exception for other negative values (we never write them, likely to be attacker)
+
+            // this assumes that a reader for T reads atleast 1 bytes
+            // we can't know the exact size of T because it could have a user created reader
+            // NOTE: dont add to length as it could overflow if value is int.max
+            if (length > reader.Length - reader.Position)
+            {
+                throw new EndOfStreamException($"Received array that is too large: {length}");
+            }
+
             T[] result = new T[length];
             for (int i = 0; i < length; i++)
             {

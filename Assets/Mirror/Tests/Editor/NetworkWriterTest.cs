@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Mirror.Tests.RemoteAttrributeTest;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Mirror.Tests
 {
@@ -1005,6 +1008,205 @@ namespace Mirror.Tests
             NetworkReader reader = new NetworkReader(writer.ToArray());
             List<int> readList = reader.Read<List<int>>();
             Assert.That(readList, Is.Null);
+        }
+
+
+        const int testArraySize = 4;
+        [Test]
+        [Description("ReadArray should throw if it is trying to read more than length of segement, this is to stop allocation attacks")]
+        public void TestArrayDoesNotThrowWithCorrectLength()
+        {
+            NetworkWriter writer = new NetworkWriter();
+            WriteGoodArray();
+
+            NetworkReader reader = new NetworkReader(writer.ToArray());
+            Assert.DoesNotThrow(() =>
+            {
+                _ = reader.ReadArray<int>();
+            });
+
+            void WriteGoodArray()
+            {
+                writer.WriteInt32(testArraySize);
+                int[] array = new int[testArraySize] { 1, 2, 3, 4 };
+                for (int i = 0; i < array.Length; i++)
+                    writer.Write(array[i]);
+            }
+        }
+        [Test]
+        [Description("ReadArray should throw if it is trying to read more than length of segement, this is to stop allocation attacks")]
+        [TestCase(testArraySize * sizeof(int), Description = "max allowed value to allocate array")]
+        [TestCase(testArraySize * 2)]
+        [TestCase(testArraySize + 1, Description = "min allowed to allocate")]
+        public void TestArrayThrowsIfLengthIsWrong(int badLength)
+        {
+            NetworkWriter writer = new NetworkWriter();
+            WriteBadArray();
+
+            NetworkReader reader = new NetworkReader(writer.ToArray());
+            EndOfStreamException exception = Assert.Throws<EndOfStreamException>(() =>
+            {
+                _ = reader.ReadArray<int>();
+            });
+            // todo inprove this message check
+            Assert.That(exception, Has.Message.Contains($"ReadBlittable<{typeof(int)}> out of range"));
+
+            void WriteBadArray()
+            {
+                writer.WriteInt32(badLength);
+                int[] array = new int[testArraySize] { 1, 2, 3, 4 };
+                for (int i = 0; i < array.Length; i++)
+                    writer.Write(array[i]);
+            }
+        }
+
+        [Test]
+        [Description("ReadArray should throw if it is trying to read more than length of segement, this is to stop allocation attacks")]
+        [TestCase(testArraySize * sizeof(int) + 1, Description = "min read count is 1 byte, 16 array bytes are writen so 17 should throw error")]
+        [TestCase(20_000)]
+        [TestCase(int.MaxValue)]
+        [TestCase(int.MaxValue - 1)]
+        // todo add fuzzy testing to check more values
+        public void TestArrayThrowsIfLengthIsTooBig(int badLength)
+        {
+            NetworkWriter writer = new NetworkWriter();
+            WriteBadArray();
+
+            NetworkReader reader = new NetworkReader(writer.ToArray());
+            EndOfStreamException exception = Assert.Throws<EndOfStreamException>(() =>
+            {
+                _ = reader.ReadArray<int>();
+            });
+            Assert.That(exception, Has.Message.EqualTo($"Received array that is too large: {badLength}"));
+
+            void WriteBadArray()
+            {
+                writer.WriteInt32(badLength);
+                int[] array = new int[testArraySize] { 1, 2, 3, 4 };
+                for (int i = 0; i < array.Length; i++)
+                    writer.Write(array[i]);
+            }
+        }
+
+        [Test]
+        public void ReadNetworkIdentityGivesWarningWhenNotFound()
+        {
+            const uint netId = 423;
+            NetworkWriter writer = new NetworkWriter();
+            writer.WriteUInt32(netId);
+            NetworkReader reader = new NetworkReader(writer.ToArray());
+
+            LogAssert.Expect(LogType.Warning, $"ReadNetworkIdentity netId:{netId} not found in spawned");
+            NetworkIdentity actual = reader.ReadNetworkIdentity();
+            Assert.That(actual, Is.Null);
+
+            Assert.That(reader.Position, Is.EqualTo(4), "should read 4 bytes");
+        }
+
+        [Test]
+        public void ReadNetworkBehaviourGivesWarningWhenNotFound()
+        {
+            const uint netId = 424;
+            NetworkWriter writer = new NetworkWriter();
+            writer.WriteUInt32(netId);
+            writer.WriteByte(0);
+            NetworkReader reader = new NetworkReader(writer.ToArray());
+
+            LogAssert.Expect(LogType.Warning, $"ReadNetworkBehaviour netId:{netId} not found in spawned");
+            NetworkBehaviour actual = reader.ReadNetworkBehaviour();
+            Assert.That(actual, Is.Null);
+
+            Assert.That(reader.Position, Is.EqualTo(5), "should read 5 bytes when netId is not 0");
+        }
+
+        [Test]
+        public void TestNetworkBehaviour()
+        {
+            //setup
+            GameObject gameObject = new GameObject();
+            NetworkIdentity identity = gameObject.AddComponent<NetworkIdentity>();
+            RpcNetworkIdentityBehaviour behaviour = gameObject.AddComponent<RpcNetworkIdentityBehaviour>();
+
+            const int netId = 100;
+            identity.netId = netId;
+            int compIndex = behaviour.ComponentIndex;
+
+            NetworkIdentity.spawned[netId] = identity;
+
+            try
+            {
+                NetworkWriter writer = new NetworkWriter();
+                writer.WriteNetworkBehaviour(behaviour);
+
+                byte[] bytes = writer.ToArray();
+
+                Assert.That(bytes.Length, Is.EqualTo(5), "Networkbehaviour should be 5 bytes long.");
+
+                NetworkReader reader = new NetworkReader(bytes);
+                RpcNetworkIdentityBehaviour actual = reader.ReadNetworkBehaviour<RpcNetworkIdentityBehaviour>();
+                Assert.That(actual, Is.EqualTo(behaviour), "Read should find the same behaviour as written");
+            }
+            // use finally so object is destroyed evne if tests fails
+            finally
+            {
+                // teardown
+                NetworkIdentity.spawned[netId] = null;
+                GameObject.DestroyImmediate(gameObject);
+            }
+        }
+
+        [Test]
+        public void TestNetworkBehaviourNull()
+        {
+            NetworkWriter writer = new NetworkWriter();
+            writer.WriteNetworkBehaviour(null);
+
+            byte[] bytes = writer.ToArray();
+
+            Assert.That(bytes.Length, Is.EqualTo(4), "null Networkbehaviour should be 4 bytes long.");
+
+            NetworkReader reader = new NetworkReader(bytes);
+            RpcNetworkIdentityBehaviour actual = reader.ReadNetworkBehaviour<RpcNetworkIdentityBehaviour>();
+            Assert.That(actual, Is.Null, "should read null");
+
+            Assert.That(reader.Position, Is.EqualTo(4), "should read 4 bytes when netid is 0");
+        }
+
+        [Test]
+        [Description("Uses Generic read function to check weaver correctly creates it")]
+        public void TestNetworkBehaviourWeaverGenerated()
+        {
+            //setup
+            GameObject gameObject = new GameObject();
+            NetworkIdentity identity = gameObject.AddComponent<NetworkIdentity>();
+            RpcNetworkIdentityBehaviour behaviour = gameObject.AddComponent<RpcNetworkIdentityBehaviour>();
+
+            const int netId = 100;
+            identity.netId = netId;
+            int compIndex = behaviour.ComponentIndex;
+
+            NetworkIdentity.spawned[netId] = identity;
+
+            try
+            {
+                NetworkWriter writer = new NetworkWriter();
+                writer.Write(behaviour);
+
+                byte[] bytes = writer.ToArray();
+
+                Assert.That(bytes.Length, Is.EqualTo(5), "Networkbehaviour should be 5 bytes long.");
+
+                NetworkReader reader = new NetworkReader(bytes);
+                RpcNetworkIdentityBehaviour actual = reader.Read<RpcNetworkIdentityBehaviour>();
+                Assert.That(actual, Is.EqualTo(behaviour), "Read should find the same behaviour as written");
+            }
+            // use finally so object is destroyed evne if tests fails
+            finally
+            {
+                // teardown
+                NetworkIdentity.spawned.Remove(netId);
+                GameObject.DestroyImmediate(gameObject);
+            }
         }
     }
 }
