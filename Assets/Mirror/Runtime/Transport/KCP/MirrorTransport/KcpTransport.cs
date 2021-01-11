@@ -93,7 +93,18 @@ namespace kcp2k
 
         public override void ClientSend(int channelId, ArraySegment<byte> segment)
         {
-            client.Send(segment);
+            // switch to kcp channel.
+            // unreliable or reliable.
+            // default to reliable just to be sure.
+            switch (channelId)
+            {
+                case Channels.DefaultUnreliable:
+                    client.Send(segment, KcpChannel.Unreliable);
+                    break;
+                default:
+                    client.Send(segment, KcpChannel.Reliable);
+                    break;
+            }
         }
         public override void ClientDisconnect() => client.Disconnect();
 
@@ -129,7 +140,18 @@ namespace kcp2k
         public override void ServerStart() => server.Start(Port);
         public override void ServerSend(int connectionId, int channelId, ArraySegment<byte> segment)
         {
-            server.Send(connectionId, segment);
+            // switch to kcp channel.
+            // unreliable or reliable.
+            // default to reliable just to be sure.
+            switch (channelId)
+            {
+                case Channels.DefaultUnreliable:
+                    server.Send(connectionId, segment, KcpChannel.Unreliable);
+                    break;
+                default:
+                    server.Send(connectionId, segment, KcpChannel.Reliable);
+                    break;
+            }
         }
         public override bool ServerDisconnect(int connectionId)
         {
@@ -143,7 +165,19 @@ namespace kcp2k
         public override void Shutdown() {}
 
         // max message size
-        public override int GetMaxPacketSize(int channelId = Channels.DefaultReliable) => KcpConnection.MaxMessageSize;
+        public override int GetMaxPacketSize(int channelId = Channels.DefaultReliable)
+        {
+            // switch to kcp channel.
+            // unreliable or reliable.
+            // default to reliable just to be sure.
+            switch (channelId)
+            {
+                case Channels.DefaultUnreliable:
+                    return KcpConnection.UnreliableMaxMessageSize;
+                default:
+                    return KcpConnection.ReliableMaxMessageSize;
+            }
+        }
 
         public override string ToString()
         {
