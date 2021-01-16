@@ -5,7 +5,7 @@ namespace Mirror
 {
     public static class SceneManager
     {
-        public delegate void OnBeginSceneLoad(AsyncOperation loadOperation);
+        public delegate void OnBeginSceneLoad(AsyncOperation loadOperation, string sceneLoadingToName);
 
         public static event OnBeginSceneLoad OnBeginSceneLoading;
 
@@ -17,7 +17,7 @@ namespace Mirror
         public static AsyncOperation LoadSceneAsync(string sceneName, LoadSceneMode loadMode = LoadSceneMode.Single)
         {
             AsyncOperation operation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, loadMode);
-            OnBeginSceneLoading?.Invoke(operation);
+            OnBeginSceneLoading?.Invoke(operation, sceneName);
 
             return operation;
         }
