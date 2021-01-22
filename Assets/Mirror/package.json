@@ -1,7 +1,7 @@
 {
   "name": "com.mirror-networking.mirror",
   "displayName": "Mirror",
-  "version": "30.3.6",
+  "version": "30.4.1",
   "unity": "2019.1",
   "description": "A package version of Mirror. Mirror is a high level Networking library for Unity, optimized for ease of use & probability of success, compatible with different low level transports.",
   "author": "Mirror Networking",
