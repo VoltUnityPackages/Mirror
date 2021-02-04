@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 // Based on https://github.com/EnlightenedOne/MirrorNetworkDiscovery
@@ -130,7 +130,7 @@ namespace Mirror.Discovery
             _ = ServerListenAsync();
         }
 
-        public async Task ServerListenAsync()
+        public async UniTask ServerListenAsync()
         {
             while (true)
             {
@@ -149,7 +149,7 @@ namespace Mirror.Discovery
             }
         }
 
-        async Task ReceiveRequestAsync(UdpClient udpClient)
+        async UniTask ReceiveRequestAsync(UdpClient udpClient)
         {
             // only proceed if there is available data in network buffer, or otherwise Receive() will block
             // average time for UdpClient.Available : 10 us
@@ -266,7 +266,7 @@ namespace Mirror.Discovery
         /// Awaits for server response
         /// </summary>
         /// <returns>ClientListenAsync Task</returns>
-        public async Task ClientListenAsync()
+        public async UniTask ClientListenAsync()
         {
             while (true)
             {
@@ -326,7 +326,7 @@ namespace Mirror.Discovery
         /// <returns>An instance of ServerRequest with data to be broadcasted</returns>
         protected virtual Request GetRequest() => default;
 
-        async Task ReceiveGameBroadcastAsync(UdpClient udpClient)
+        async UniTask ReceiveGameBroadcastAsync(UdpClient udpClient)
         {
             // only proceed if there is available data in network buffer, or otherwise Receive() will block
             // average time for UdpClient.Available : 10 us
