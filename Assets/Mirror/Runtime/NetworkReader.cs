@@ -37,8 +37,6 @@ namespace Mirror
     /// </summary>
     public class NetworkReader
     {
-        static readonly ILogger logger = LogFactory.GetLogger<NetworkReader>();
-
         // Custom NetworkReader that doesn't use C#'s built in MemoryStream in order to
         // avoid allocations.
         //
@@ -137,7 +135,7 @@ namespace Mirror
             Func<NetworkReader, T> readerDelegate = Reader<T>.read;
             if (readerDelegate == null)
             {
-                logger.LogError($"No reader found for {typeof(T)}. Use a type supported by Mirror or define a custom reader");
+                Debug.LogError($"No reader found for {typeof(T)}. Use a type supported by Mirror or define a custom reader");
                 return default;
             }
             return readerDelegate(this);
@@ -149,8 +147,6 @@ namespace Mirror
     // but they do all need to be extensions.
     public static class NetworkReaderExtensions
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(NetworkReaderExtensions));
-
         // cache encoding instead of creating it each time
         // 1000 readers before:  1MB GC, 30ms
         // 1000 readers after: 0.8MB GC, 18ms
@@ -301,14 +297,14 @@ namespace Mirror
         public static Guid ReadGuid(this NetworkReader reader) => new Guid(reader.ReadBytes(16));
         public static Transform ReadTransform(this NetworkReader reader)
         {
-            // Dont use null propagation here as it could lead to MissingReferenceException
+            // Don't use null propagation here as it could lead to MissingReferenceException
             NetworkIdentity networkIdentity = reader.ReadNetworkIdentity();
             return networkIdentity != null ? networkIdentity.transform : null;
         }
 
         public static GameObject ReadGameObject(this NetworkReader reader)
         {
-            // Dont use null propagation here as it could lead to MissingReferenceException
+            // Don't use null propagation here as it could lead to MissingReferenceException
             NetworkIdentity networkIdentity = reader.ReadNetworkIdentity();
             return networkIdentity != null ? networkIdentity.gameObject : null;
         }
@@ -394,9 +390,9 @@ namespace Mirror
 
             // todo throw an exception for other negative values (we never write them, likely to be attacker)
 
-            // this assumes that a reader for T reads atleast 1 bytes
+            // this assumes that a reader for T reads at least 1 bytes
             // we can't know the exact size of T because it could have a user created reader
-            // NOTE: dont add to length as it could overflow if value is int.max
+            // NOTE: don't add to length as it could overflow if value is int.max
             if (length > reader.Length - reader.Position)
             {
                 throw new EndOfStreamException($"Received array that is too large: {length}");

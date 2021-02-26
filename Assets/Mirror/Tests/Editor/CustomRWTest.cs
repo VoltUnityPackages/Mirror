@@ -4,7 +4,7 @@ namespace Mirror.Tests
 {
     public class MockQuest
     {
-        public int Id { get; set; }
+        public int Id;
 
         public MockQuest(int id)
         {
@@ -46,9 +46,9 @@ namespace Mirror.Tests
                 quest = new MockQuest(100)
             };
 
-            byte[] data = MessagePackerTest.PackToByteArray(message);
+            byte[] data = MessagePackingTest.PackToByteArray(message);
 
-            QuestMessage unpacked = MessagePackerTest.UnpackFromByteArray<QuestMessage>(data);
+            QuestMessage unpacked = MessagePackingTest.UnpackFromByteArray<QuestMessage>(data);
 
             Assert.That(unpacked.quest.Id, Is.EqualTo(100));
         }

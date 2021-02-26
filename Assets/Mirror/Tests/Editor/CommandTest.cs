@@ -21,7 +21,7 @@ namespace Mirror.Tests.RemoteAttrributeTest
     {
         public event Action<int> onSendInt;
 
-        [Command(ignoreAuthority = true)]
+        [Command(requiresAuthority = false)]
         public void CmdSendInt(int someInt)
         {
             onSendInt?.Invoke(someInt);
@@ -43,7 +43,7 @@ namespace Mirror.Tests.RemoteAttrributeTest
     {
         public event Action<int, NetworkConnection> onSendInt;
 
-        [Command(ignoreAuthority = true)]
+        [Command(requiresAuthority = false)]
         public void CmdSendInt(int someInt, NetworkConnectionToClient conn = null)
         {
             onSendInt?.Invoke(someInt, conn);
@@ -193,7 +193,7 @@ namespace Mirror.Tests.RemoteAttrributeTest
             {
                 hostBehaviour.SendThrow(someInt);
                 ProcessMessages();
-            }, "Processing new message should not throw, the execption from SendThrow should be caught");
+            }, "Processing new message should not throw, the exception from SendThrow should be caught");
         }
     }
 }

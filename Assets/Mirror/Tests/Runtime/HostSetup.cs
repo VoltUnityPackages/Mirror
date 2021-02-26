@@ -15,13 +15,13 @@ namespace Mirror.Tests.Runtime
 
         protected virtual bool AutoAddPlayer => true;
 
-        protected virtual void afterStartHost() { }
-        protected virtual void beforeStopHost() { }
+        protected virtual void afterStartHost() {}
+        protected virtual void beforeStopHost() {}
 
         protected static void FakeSpawnServerClientIdentity(NetworkIdentity serverNI, NetworkIdentity clientNI)
         {
             serverNI.OnStartServer();
-            serverNI.RebuildObservers(true);
+            NetworkServer.RebuildObservers(serverNI, true);
 
             clientNI.netId = serverNI.netId;
             NetworkIdentity.spawned[serverNI.netId] = clientNI;

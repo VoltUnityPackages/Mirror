@@ -137,7 +137,7 @@ namespace Mirror.Cloud.ListServer
                 yield return new WaitForSeconds(1);
             }
 
-            // We need to check added incase Update is called soon after Add, and add failed
+            // We need to check added in case Update is called soon after Add, and add failed
             if (!added) { Logger.LogWarning("UpdateServer called when before server was added"); yield break; }
 
             sending = true;
@@ -177,7 +177,7 @@ namespace Mirror.Cloud.ListServer
                 sending = false;
             }
 
-            Logger.LogWarning("Max ping fails reached, stoping to ping server");
+            Logger.LogWarning("Max ping fails reached, stopping to ping server");
             _pingCoroutine = null;
 
 
@@ -205,7 +205,7 @@ namespace Mirror.Cloud.ListServer
         {
             if (string.IsNullOrEmpty(serverId))
             {
-                Logger.LogWarning("Can not remove server becuase serverId was empty");
+                Logger.LogWarning("Can not remove server because serverId was empty");
                 return;
             }
 

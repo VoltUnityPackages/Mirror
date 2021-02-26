@@ -55,7 +55,7 @@ namespace Mirror
 
         #region Client
         /// <summary>
-        /// Notify subscribers when when this client establish a successful connection to the server
+        /// Notify subscribers when this client establish a successful connection to the server
         /// <para>callback()</para>
         /// </summary>
         public Action OnClientConnected = () => Debug.LogWarning("OnClientConnected called with no handler");
@@ -237,7 +237,7 @@ namespace Mirror
         //            ShoulderRotation.LateUpdate, resulting in projectile
         //            spawns at the point before shoulder rotation.
 #pragma warning disable UNT0001 // Empty Unity message
-        public void Update() { }
+        public void Update() {}
 #pragma warning restore UNT0001 // Empty Unity message
 
         /// <summary>

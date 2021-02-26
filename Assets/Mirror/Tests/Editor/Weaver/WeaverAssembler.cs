@@ -20,13 +20,13 @@ namespace Mirror.Weaver.Tests
                 return _outputDirectory;
             }
         }
-        public static string OutputFile { get; set; }
+        public static string OutputFile;
         public static HashSet<string> SourceFiles { get; private set; }
         public static HashSet<string> ReferenceAssemblies { get; private set; }
-        public static bool AllowUnsafe { get; set; }
+        public static bool AllowUnsafe;
         public static List<CompilerMessage> CompilerMessages { get; private set; }
         public static bool CompilerErrors { get; private set; }
-        public static bool DeleteOutputOnClear { get; set; }
+        public static bool DeleteOutputOnClear;
 
         // static constructor to initialize static properties
         static WeaverAssembler()
@@ -110,21 +110,21 @@ namespace Mirror.Weaver.Tests
                 File.Delete(projPathFile);
 
             }
-            catch { }
+            catch {}
 
             try
             {
                 File.Delete(Path.ChangeExtension(projPathFile, ".pdb"));
 
             }
-            catch { }
+            catch {}
 
             try
             {
                 File.Delete(Path.ChangeExtension(projPathFile, ".dll.mdb"));
 
             }
-            catch { }
+            catch {}
         }
 
         // clear all settings except for referenced assemblies (which are cleared with ClearReferences)

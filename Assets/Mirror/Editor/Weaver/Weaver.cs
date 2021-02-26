@@ -46,7 +46,7 @@ namespace Mirror.Editor.Weaver
         public static WeaverLists WeaveLists { get; private set; }
         public static AssemblyDefinition CurrentAssembly { get; private set; }
         public static bool WeavingFailed { get; private set; }
-        public static bool GenerateLogErrors { get; set; }
+        public static bool GenerateLogErrors;
 
         // private properties
         static readonly bool DebugLogEnabled = true;

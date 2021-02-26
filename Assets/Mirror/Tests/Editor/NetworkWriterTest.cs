@@ -154,7 +154,7 @@ namespace Mirror.Tests
         public void TestReading0LengthBytesAndSize()
         {
             NetworkWriter writer = new NetworkWriter();
-            writer.WriteBytesAndSize(new byte[] { });
+            writer.WriteBytesAndSize(new byte[] {});
             NetworkReader reader = new NetworkReader(writer.ToArray());
             Assert.That(reader.ReadBytesAndSize().Length, Is.EqualTo(0));
         }
@@ -163,7 +163,7 @@ namespace Mirror.Tests
         public void TestReading0LengthBytes()
         {
             NetworkWriter writer = new NetworkWriter();
-            writer.WriteBytes(new byte[] { }, 0, 0);
+            writer.WriteBytes(new byte[] {}, 0, 0);
             NetworkReader reader = new NetworkReader(writer.ToArray());
             Assert.That(reader.ReadBytes(0).Length, Is.EqualTo(0));
         }
@@ -181,7 +181,7 @@ namespace Mirror.Tests
         {
             void EnsureThrows(Action<NetworkReader> read, byte[] data = null)
             {
-                Assert.Throws<System.IO.EndOfStreamException>(() => read(new NetworkReader(data ?? new byte[] { })));
+                Assert.Throws<System.IO.EndOfStreamException>(() => read(new NetworkReader(data ?? new byte[] {})));
             }
             // Try reading more than there is data to be read from
             // This should throw EndOfStreamException always
@@ -973,7 +973,7 @@ namespace Mirror.Tests
 
         const int testArraySize = 4;
         [Test]
-        [Description("ReadArray should throw if it is trying to read more than length of segement, this is to stop allocation attacks")]
+        [Description("ReadArray should throw if it is trying to read more than length of segment, this is to stop allocation attacks")]
         public void TestArrayDoesNotThrowWithCorrectLength()
         {
             NetworkWriter writer = new NetworkWriter();
@@ -994,7 +994,7 @@ namespace Mirror.Tests
             }
         }
         [Test]
-        [Description("ReadArray should throw if it is trying to read more than length of segement, this is to stop allocation attacks")]
+        [Description("ReadArray should throw if it is trying to read more than length of segment, this is to stop allocation attacks")]
         [TestCase(testArraySize * sizeof(int), Description = "max allowed value to allocate array")]
         [TestCase(testArraySize * 2)]
         [TestCase(testArraySize + 1, Description = "min allowed to allocate")]
@@ -1021,7 +1021,7 @@ namespace Mirror.Tests
         }
 
         [Test]
-        [Description("ReadArray should throw if it is trying to read more than length of segement, this is to stop allocation attacks")]
+        [Description("ReadArray should throw if it is trying to read more than length of segment, this is to stop allocation attacks")]
         [TestCase(testArraySize * sizeof(int) + 1, Description = "min read count is 1 byte, 16 array bytes are writen so 17 should throw error")]
         [TestCase(20_000)]
         [TestCase(int.MaxValue)]

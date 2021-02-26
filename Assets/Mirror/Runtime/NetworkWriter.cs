@@ -23,8 +23,6 @@ namespace Mirror
     /// </summary>
     public class NetworkWriter
     {
-        static readonly ILogger logger = LogFactory.GetLogger<NetworkWriter>();
-
         public const int MaxStringLength = 1024 * 32;
 
         // create writer immediately with it's own buffer so no one can mess with it and so that we can resize it.
@@ -112,7 +110,7 @@ namespace Mirror
         }
 
         /// <summary>
-        /// Copys buffer to new array with the size of <see cref="Length"/>
+        /// Copies buffer to new array with the size of <see cref="Length"/>
         /// <para></para>
         /// </summary>
         /// <returns>all the data we have written, regardless of the current position</returns>
@@ -126,7 +124,7 @@ namespace Mirror
         /// <summary>
         /// Create an ArraySegment using the buffer and <see cref="Length"/>
         /// <para>
-        ///     Dont modify the NetworkWriter while using the ArraySegment as this can overwrite the bytes
+        ///     Don't modify the NetworkWriter while using the ArraySegment as this can overwrite the bytes
         /// </para>
         /// <para>
         ///     Use ToArraySegment instead of ToArray to avoid allocations
@@ -163,7 +161,7 @@ namespace Mirror
             Action<NetworkWriter, T> writeDelegate = Writer<T>.write;
             if (writeDelegate == null)
             {
-                logger.LogError($"No writer found for {typeof(T)}. Use a type supported by Mirror or define a custom writer");
+                Debug.LogError($"No writer found for {typeof(T)}. Use a type supported by Mirror or define a custom writer");
             }
             else
             {
@@ -177,8 +175,6 @@ namespace Mirror
     // but they do all need to be extensions.
     public static class NetworkWriterExtensions
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(NetworkWriterExtensions));
-
         // cache encoding instead of creating it with BinaryWriter each time
         // 1000 readers before:  1MB GC, 30ms
         // 1000 readers after: 0.8MB GC, 18ms
@@ -288,7 +284,7 @@ namespace Mirror
         public static void WriteBytesAndSize(this NetworkWriter writer, byte[] buffer, int offset, int count)
         {
             // null is supported because [SyncVar]s might be structs with null byte[] arrays
-            // write 0 for null array, increment normal size by 1 to save bandwith
+            // write 0 for null array, increment normal size by 1 to save bandwidth
             // (using size=-1 for null would limit max size to 32kb instead of 64kb)
             if (buffer == null)
             {
@@ -451,7 +447,7 @@ namespace Mirror
             }
             else
             {
-                logger.LogWarning("NetworkWriter " + value + " has no NetworkIdentity");
+                Debug.LogWarning("NetworkWriter " + value + " has no NetworkIdentity");
                 writer.WriteUInt32(0);
             }
         }
@@ -470,7 +466,7 @@ namespace Mirror
             }
             else
             {
-                logger.LogWarning("NetworkWriter " + value + " has no NetworkIdentity");
+                Debug.LogWarning("NetworkWriter " + value + " has no NetworkIdentity");
                 writer.WriteUInt32(0);
             }
         }

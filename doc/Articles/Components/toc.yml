@@ -13,14 +13,14 @@
   href: NetworkHeadlessLogger.md
 - name: Network Lerp Rigidbody
   href: NetworkLerpRigidbody.md
-- name: Network Log Settings
-  href: NetworkLogSettings.md
 - name: Network Manager
   href: NetworkManager.md
 - name: Network Manager HUD
   href: NetworkManagerHUD.md
 - name: Network Match Checker
   href: NetworkMatchChecker.md
+- name: Network Owner Checker
+  href: NetworkOwnerChecker.md
 - name: Network Ping Display
   href: NetworkPingDisplay.md
 - name: Network Proximity Checker
