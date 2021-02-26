@@ -229,7 +229,7 @@ namespace Mirror
                 if (transport == null)
                 {
                     transport = gameObject.AddComponent<NullTransport>();
-                    logger.Log("NetworkManager: added default Transport because there was none yet.");
+                    Debug.Log("NetworkManager: added default Transport because there was none yet.");
                 }
 #if UNITY_EDITOR
                 // For some insane reason, this line fails when building unless wrapped in this define. Stupid but true.

@@ -68,5 +68,10 @@ namespace Mirror
         {
             return UnityEngine.SceneManagement.SceneManager.GetSceneByPath(path);
         }
+
+        public static void MoveGameObjectToScene(GameObject go, Scene scene)
+        {
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, scene);
+        }
     }
 }
