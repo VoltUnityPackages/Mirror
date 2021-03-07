@@ -22,35 +22,27 @@ namespace Mirror
         /// <summary> NetworkIdentity of the localPlayer </summary>
         public static NetworkIdentity localPlayer { get; private set; }
 
-        /// <summary>
-        /// Returns true when a client's connection has been set to ready.
-        /// <para>A client that is ready receives state updates from the server, while a client that is not ready does not. This useful when the state of the game is not normal, such as a scene change or end-of-game.</para>
-        /// <para>This is read-only. To change the ready state of a client, use ClientScene.Ready(). The server is able to set the ready state of clients using NetworkServer.SetClientReady(), NetworkServer.SetClientNotReady() and NetworkServer.SetAllClientsNotReady().</para>
-        /// <para>This is done when changing scenes so that clients don't receive state update messages during scene loading.</para>
-        /// </summary>
+        /// <summary>True if client is ready (= joined world).</summary>
         public static bool ready;
 
-        /// <summary>
-        /// The NetworkConnection object that is currently "ready". This is the connection to the server where objects are spawned from.
-        /// <para>This connection can be used to send messages to the server. There can only be one ClientScene and ready connection at a time.</para>
-        /// </summary>
+        /// <summary>The NetworkConnection object that is currently "ready".</summary>
+        // This connection can be used to send messages to the server. There can
+        // only be one ClientScene and ready connection at a time.
         public static NetworkConnection readyConnection { get; private set; }
 
-        /// <summary>
-        /// This is a dictionary of the prefabs that are registered on the client with ClientScene.RegisterPrefab().
-        /// <para>The key to the dictionary is the prefab asset Id.</para>
-        /// </summary>
-        public static readonly Dictionary<Guid, GameObject> prefabs = new Dictionary<Guid, GameObject>();
+        /// <summary>Registered spawnable prefabs by assetId.</summary>
+        public static readonly Dictionary<Guid, GameObject> prefabs =
+            new Dictionary<Guid, GameObject>();
 
-        /// <summary>
-        /// This is dictionary of the disabled NetworkIdentity objects in the scene that could be spawned by messages from the server.
-        /// <para>The key to the dictionary is the NetworkIdentity sceneId.</para>
-        /// </summary>
-        internal static readonly Dictionary<ulong, NetworkIdentity> spawnableObjects = new Dictionary<ulong, NetworkIdentity>();
+        /// <summary>Disabled scene objects that can be spawned again, by sceneId.</summary>
+        internal static readonly Dictionary<ulong, NetworkIdentity> spawnableObjects =
+            new Dictionary<ulong, NetworkIdentity>();
 
         // spawn handlers
-        internal static readonly Dictionary<Guid, SpawnHandlerDelegate> spawnHandlers = new Dictionary<Guid, SpawnHandlerDelegate>();
-        internal static readonly Dictionary<Guid, UnSpawnDelegate> unspawnHandlers = new Dictionary<Guid, UnSpawnDelegate>();
+        internal static readonly Dictionary<Guid, SpawnHandlerDelegate> spawnHandlers =
+            new Dictionary<Guid, SpawnHandlerDelegate>();
+        internal static readonly Dictionary<Guid, UnSpawnDelegate> unspawnHandlers =
+            new Dictionary<Guid, UnSpawnDelegate>();
 
         internal static void Shutdown()
         {
@@ -62,10 +54,7 @@ namespace Mirror
             DestroyAllClientObjects();
         }
 
-        /// <summary>
-        /// this is called from message handler for Owner message
-        /// </summary>
-        /// <param name="identity"></param>
+        // called from message handler for Owner message
         internal static void InternalAddPlayer(NetworkIdentity identity)
         {
             //Debug.Log("ClientScene.InternalAddPlayer");
@@ -85,21 +74,15 @@ namespace Mirror
             else Debug.LogWarning("No ready connection found for setting player controller during InternalAddPlayer");
         }
 
-        /// <summary>
-        /// Sets localPlayer to null
-        /// <para>Should be called when the local player object is destroyed</para>
-        /// </summary>
+        // Sets localPlayer to null. Should be called when the local player
+        // object is destroyed.
         internal static void ClearLocalPlayer()
         {
             //Debug.Log("ClientScene.ClearLocalPlayer");
             localPlayer = null;
         }
 
-        /// <summary>
-        /// This adds a player GameObject for this client. This causes an AddPlayer message to be sent to the server, and NetworkManager.OnServerAddPlayer is called.
-        /// </summary>
-        /// <param name="readyConn">The connection to become ready for this client.</param>
-        /// <returns>True if AddPlayer message was sent</returns>
+        /// <summary>Sends AddPlayer message to the server, indicating that we want to join the world.</summary>
         public static bool AddPlayer(NetworkConnection readyConn)
         {
             // ensure valid ready connection
@@ -126,12 +109,11 @@ namespace Mirror
             return true;
         }
 
-        /// <summary>
-        /// Signal that the client connection is ready to enter the game.
-        /// <para>This could be for example when a client enters an ongoing game and has finished loading the current scene. The server should respond to the SYSTEM_READY event with an appropriate handler which instantiates the players object for example.</para>
-        /// </summary>
-        /// <param name="conn">The client connection which is ready.</param>
-        /// <returns>True if successful</returns>
+        /// <summary>Sends Ready message to server, indicating that we loaded the scene, ready to enter the game.</summary>
+        // This could be for example when a client enters an ongoing game and
+        // has finished loading the current scene. The server should respond to
+        // the SYSTEM_READY event with an appropriate handler which instantiates
+        // the players object for example.
         public static bool Ready(NetworkConnection conn)
         {
             if (ready)
@@ -152,7 +134,6 @@ namespace Mirror
 
                 // Tell server we're ready to have a player object spawned
                 conn.Send(new ReadyMessage());
-
                 return true;
             }
             Debug.LogError("Ready() called with invalid connection object: conn=null");
@@ -168,9 +149,7 @@ namespace Mirror
             }
         }
 
-        /// <summary>
-        /// Checks if identity is not spawned yet, not hidden and has sceneId
-        /// </summary>
+        // Checks if identity is not spawned yet, not hidden and has sceneId
         static bool ConsiderForSpawning(NetworkIdentity identity)
         {
             // not spawned yet, not hidden, etc.?
@@ -180,9 +159,7 @@ namespace Mirror
                    identity.sceneId != 0;
         }
 
-        /// <summary>
-        /// Call this after loading/unloading a scene in the client after connection to register the spawnable objects
-        /// </summary>
+        /// <summary>Call this after loading/unloading a scene in the client after connection to register the spawnable objects</summary>
         public static void PrepareToSpawnSceneObjects()
         {
             // remove existing items, they will be re-added below
@@ -200,13 +177,8 @@ namespace Mirror
             }
         }
 
-        /// <summary>
-        /// Find the registered prefab for this asset id.
-        /// Useful for debuggers
-        /// </summary>
-        /// <param name="assetId">asset id of the prefab</param>
-        /// <param name="prefab">the prefab gameobject</param>
-        /// <returns>true if prefab was registered</returns>
+        /// <summary>Find the registered prefab for this asset id.</summary>
+        // Useful for debuggers
         public static bool GetPrefab(Guid assetId, out GameObject prefab)
         {
             prefab = null;
@@ -214,10 +186,7 @@ namespace Mirror
                    prefabs.TryGetValue(assetId, out prefab) && prefab != null;
         }
 
-        /// <summary>
-        /// Valids Prefab then adds it to prefabs dictionary
-        /// </summary>
-        /// <param name="prefab">NetworkIdentity on Prefab GameObject</param>
+        /// <summary>Validates Prefab then adds it to prefabs dictionary.</summary>
         static void RegisterPrefabIdentity(NetworkIdentity prefab)
         {
             if (prefab.assetId == Guid.Empty)
@@ -254,15 +223,8 @@ namespace Mirror
             prefabs[prefab.assetId] = prefab.gameObject;
         }
 
-        /// <summary>
-        /// Registers a prefab with the spawning system.
-        /// <para>When a NetworkIdentity object is spawned on a server with NetworkServer.SpawnObject(), and the prefab that the object was created from was registered with RegisterPrefab(), the client will use that prefab to instantiate a corresponding client object with the same netId.</para>
-        /// <para>The NetworkManager has a list of spawnable prefabs, it uses this function to register those prefabs with the ClientScene.</para>
-        /// <para>The set of current spawnable object is available in the ClientScene static member variable ClientScene.prefabs, which is a dictionary of NetworkAssetIds and prefab references.</para>
-        /// <para>NOTE: newAssetId can not be set on GameObjects that already have an assetId</para>
-        /// </summary>
-        /// <param name="prefab">A GameObject that will be spawned.</param>
-        /// <param name="newAssetId">An assetId to be assigned to this GameObject. This allows a dynamically created game object to be registered for an already known asset Id.</param>
+        /// <summary>Register spawnable prefab with custom assetId.</summary>
+        // Note: newAssetId can not be set on GameObjects that already have an assetId
         public static void RegisterPrefab(GameObject prefab, Guid newAssetId)
         {
             if (prefab == null)
@@ -295,13 +257,7 @@ namespace Mirror
             RegisterPrefabIdentity(identity);
         }
 
-        /// <summary>
-        /// Registers a prefab with the spawning system.
-        /// <para>When a NetworkIdentity object is spawned on a server with NetworkServer.SpawnObject(), and the prefab that the object was created from was registered with RegisterPrefab(), the client will use that prefab to instantiate a corresponding client object with the same netId.</para>
-        /// <para>The NetworkManager has a list of spawnable prefabs, it uses this function to register those prefabs with the ClientScene.</para>
-        /// <para>The set of current spawnable object is available in the ClientScene static member variable ClientScene.prefabs, which is a dictionary of NetworkAssetIds and prefab references.</para>
-        /// </summary>
-        /// <param name="prefab">A Prefab that will be spawned.</param>
+        /// <summary>Register spawnable prefab.</summary>
         public static void RegisterPrefab(GameObject prefab)
         {
             if (prefab == null)
@@ -671,6 +627,8 @@ namespace Mirror
         /// Destroys all networked objects on the client.
         /// <para>This can be used to clean up when a network connection is closed.</para>
         /// </summary>
+        //
+        // Note: NetworkServer.CleanupNetworkIdentities does the same on server.
         public static void DestroyAllClientObjects()
         {
             // user can modify spawned lists which causes InvalidOperationException
@@ -686,14 +644,17 @@ namespace Mirror
                         bool wasUnspawned = InvokeUnSpawnHandler(identity.assetId, identity.gameObject);
                         if (!wasUnspawned)
                         {
-                            if (identity.sceneId == 0)
-                            {
-                                Object.Destroy(identity.gameObject);
-                            }
-                            else
+                            // scene objects are reset and disabled.
+                            // they always stay in the scene, we don't destroy them.
+                            if (identity.sceneId != 0)
                             {
                                 identity.Reset();
                                 identity.gameObject.SetActive(false);
+                            }
+                            // spawned objects are destroyed
+                            else
+                            {
+                                GameObject.Destroy(identity.gameObject);
                             }
                         }
                     }
