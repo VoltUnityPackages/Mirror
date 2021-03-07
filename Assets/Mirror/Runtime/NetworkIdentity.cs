@@ -114,60 +114,53 @@ namespace Mirror
     {
         NetworkBehaviour[] networkBehavioursCache;
 
-        /// <summary>
-        /// Returns true if running as a client and this object was spawned by a server.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        ///     <b>IMPORTANT:</b> checking NetworkClient.active means that isClient is false in OnDestroy:
-        /// </para>
-        /// <c>
-        ///     public bool isClient => NetworkClient.active &amp;&amp; netId != 0 &amp;&amp; !serverOnly;
-        /// </c>
-        /// <para>
-        ///     but we need it in OnDestroy, e.g. when saving skillbars on quit. this
-        ///     works fine if we keep the UNET way of setting isClient manually.
-        /// </para>
-        /// <para>
-        ///     => fixes <see href="https://github.com/vis2k/Mirror/issues/1475"/>
-        /// </para>
-        /// </remarks>
+        /// <summary>Returns true if running as a client and this object was spawned by a server.</summary>
+        //
+        // IMPORTANT:
+        //   OnStartClient sets it to true. we NEVER set it to false after.
+        //   otherwise components like Skillbars couldn't use OnDestroy()
+        //   for saving, etc. since isClient may have been reset before
+        //   OnDestroy was called.
+        //
+        //   we also DO NOT make it dependent on NetworkClient.active or similar.
+        //   we set it, then never change it. that's the user's expectation too.
+        //
+        //   => fixes https://github.com/vis2k/Mirror/issues/1475
         public bool isClient { get; internal set; }
 
-        /// <summary>
-        /// Returns true if NetworkServer.active and server is not stopped.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        ///    <b>IMPORTANT:</b> checking NetworkServer.active means that isServer is false in OnDestroy:
-        /// </para>
-        /// <c>
-        ///     public bool isServer => NetworkServer.active &amp;&amp; netId != 0;
-        /// </c>
-        /// <para>
-        ///     but we need it in OnDestroy, e.g. when saving players on quit. this
-        ///     works fine if we keep the UNET way of setting isServer manually.
-        /// </para>
-        /// <para>
-        ///     => fixes <see href="https://github.com/vis2k/Mirror/issues/1484"/>
-        /// </para>
-        /// </remarks>
+        /// <summary>Returns true if NetworkServer.active and server is not stopped.</summary>
+        //
+        // IMPORTANT:
+        //   OnStartServer sets it to true. we NEVER set it to false after.
+        //   otherwise components like Skillbars couldn't use OnDestroy()
+        //   for saving, etc. since isServer may have been reset before
+        //   OnDestroy was called.
+        //
+        //   we also DO NOT make it dependent on NetworkServer.active or similar.
+        //   we set it, then never change it. that's the user's expectation too.
+        //
+        //   => fixes https://github.com/vis2k/Mirror/issues/1484
+        //   => fixes https://github.com/vis2k/Mirror/issues/2533
         public bool isServer { get; internal set; }
 
-        /// <summary>
-        /// This returns true if this object is the one that represents the player on the local machine.
-        /// <para>This is set when the server has spawned an object for this particular client.</para>
-        /// </summary>
-        public bool isLocalPlayer => ClientScene.localPlayer == this;
+        /// <summary>Return true if this object represents the player on the local machine.</summary>
+        //
+        // IMPORTANT:
+        //   OnStartLocalPlayer sets it to true. we NEVER set it to false after.
+        //   otherwise components like Skillbars couldn't use OnDestroy()
+        //   for saving, etc. since isLocalPlayer may have been reset before
+        //   OnDestroy was called.
+        //
+        //   we also DO NOT make it dependent on ClientScene.localPlayer or similar.
+        //   we set it, then never change it. that's the user's expectation too.
+        //
+        //   => fixes https://github.com/vis2k/Mirror/issues/2615
+        public bool isLocalPlayer { get; internal set; }
 
-        /// <summary>
-        /// True if this object only exists on the server
-        /// </summary>
+        /// <summary>True if this object only exists on the server</summary>
         public bool isServerOnly => isServer && !isClient;
 
-        /// <summary>
-        /// True if this object exists on a client that is not also acting as a server
-        /// </summary>
+        /// <summary>True if this object exists on a client that is not also acting as a server.</summary>
         public bool isClientOnly => isClient && !isServer;
 
         /// <summary>
@@ -260,10 +253,8 @@ namespace Mirror
             }
         }
 
-
 #pragma warning disable 618
         NetworkVisibility visibilityCache;
-#pragma warning restore 618
         [Obsolete(NetworkVisibilityObsoleteMessage.Message)]
         public NetworkVisibility visibility
         {
@@ -276,6 +267,7 @@ namespace Mirror
                 return visibilityCache;
             }
         }
+#pragma warning restore 618
 
         // current visibility
         //
@@ -674,10 +666,12 @@ namespace Mirror
         }
 #endif
 
-        /// <summary>
-        /// Unity will Destroy all networked objects on Scene Change, so we have to handle that here silently.
-        /// That means we cannot have any warning or logging in this method.
-        /// </summary>
+        // OnDestroy is called for all SPAWNED NetworkIdentities
+        // => scene objects aren't destroyed. it's not called for them.
+        //
+        // Note: Unity will Destroy all networked objects on Scene Change, so we
+        // have to handle that here silently. That means we cannot have any
+        // warning or logging in this method.
         void OnDestroy()
         {
             // Objects spawned from Instantiate are not allowed so are destroyed right away
@@ -708,6 +702,15 @@ namespace Mirror
 
             // set isServer flag
             isServer = true;
+
+            // set isLocalPlayer earlier, in case OnStartLocalplayer is called
+            // AFTER OnStartClient, in which case it would still be falsse here.
+            // many projects will check isLocalPlayer in OnStartClient though.
+            // TODO ideally set isLocalPlayer when ClientScene.localPlayer is set?
+            if (ClientScene.localPlayer == this)
+            {
+                isLocalPlayer = true;
+            }
 
             // If the instance/net ID is invalid here then this is an object instantiated from a prefab and the server should assign a valid ID
             // NOTE: this might not be necessary because the above m_IsServer
@@ -785,6 +788,15 @@ namespace Mirror
 
             isClient = true;
 
+            // set isLocalPlayer earlier, in case OnStartLocalplayer is called
+            // AFTER OnStartClient, in which case it would still be falsse here.
+            // many projects will check isLocalPlayer in OnStartClient though.
+            // TODO ideally set isLocalPlayer when ClientScene.localPlayer is set?
+            if (ClientScene.localPlayer == this)
+            {
+                isLocalPlayer = true;
+            }
+
             // Debug.Log("OnStartClient " + gameObject + " netId:" + netId);
             foreach (NetworkBehaviour comp in NetworkBehaviours)
             {
@@ -811,6 +823,8 @@ namespace Mirror
             if (previousLocalPlayer == this)
                 return;
             previousLocalPlayer = this;
+
+            isLocalPlayer = true;
 
             foreach (NetworkBehaviour comp in NetworkBehaviours)
             {
@@ -918,7 +932,6 @@ namespace Mirror
                 {
                     Debug.LogError("Exception in OnStopClient:" + e.Message + " " + e.StackTrace);
                 }
-                isServer = false;
             }
         }
 
@@ -1263,6 +1276,7 @@ namespace Mirror
             clientStarted = false;
             isClient = false;
             isServer = false;
+            isLocalPlayer = false;
 
             netId = 0;
             connectionToServer = null;
@@ -1276,70 +1290,6 @@ namespace Mirror
                 ClientScene.ClearLocalPlayer();
             }
         }
-
-        /// <summary>
-        /// Invoked by NetworkServer.Update during LateUpdate
-        /// </summary>
-        internal void ServerUpdate()
-        {
-            if (observers != null && observers.Count > 0)
-            {
-                SendUpdateVarsMessage();
-            }
-            else
-            {
-                // clear all component's dirty bits.
-                // it would be spawned on new observers anyway.
-                ClearAllComponentsDirtyBits();
-            }
-        }
-
-        void SendUpdateVarsMessage()
-        {
-            // one writer for owner, one for observers
-            using (PooledNetworkWriter ownerWriter = NetworkWriterPool.GetWriter(), observersWriter = NetworkWriterPool.GetWriter())
-            {
-                // serialize all the dirty components and send
-                OnSerializeAllSafely(false, ownerWriter, out int ownerWritten, observersWriter, out int observersWritten);
-                if (ownerWritten > 0 || observersWritten > 0)
-                {
-                    UpdateVarsMessage varsMessage = new UpdateVarsMessage
-                    {
-                        netId = netId
-                    };
-
-                    // send ownerWriter to owner
-                    // (only if we serialized anything for owner)
-                    // (only if there is a connection (e.g. if not a monster),
-                    //  and if connection is ready because we use SendToReady
-                    //  below too)
-                    if (ownerWritten > 0)
-                    {
-                        varsMessage.payload = ownerWriter.ToArraySegment();
-                        if (connectionToClient != null && connectionToClient.isReady)
-                            NetworkServer.SendToClientOfPlayer(this, varsMessage);
-                    }
-
-                    // send observersWriter to everyone but owner
-                    // (only if we serialized anything for observers)
-                    if (observersWritten > 0)
-                    {
-                        varsMessage.payload = observersWriter.ToArraySegment();
-                        NetworkServer.SendToReady(this, varsMessage, false);
-                    }
-
-                    // clear dirty bits only for the components that we serialized
-                    // DO NOT clean ALL component's dirty bits, because
-                    // components can have different syncIntervals and we don't
-                    // want to reset dirty bits for the ones that were not
-                    // synced yet.
-                    // (we serialized only the IsDirty() components, or all of
-                    //  them if initialState. clearing the dirty ones is enough.)
-                    ClearDirtyComponentsDirtyBits();
-                }
-            }
-        }
-
 
         /// <summary>
         /// clear all component's dirty bits no matter what

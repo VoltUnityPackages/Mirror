@@ -1,5 +1,7 @@
 ![Mirror Logo](https://i.imgur.com/we6li1x.png)
 
+[![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://mirror-networking.gitbook.io/)
+[![Forum](https://img.shields.io/badge/forum-brightgreen.svg)](https://forum.unity.com/threads/mirror-networking-for-unity-aka-hlapi-community-edition.425437/)
 [![Build](https://img.shields.io/appveyor/ci/vis2k73562/hlapi-community-edition/Mirror.svg)](https://ci.appveyor.com/project/vis2k73562/hlapi-community-edition/branch/mirror)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vis2k_Mirror&metric=coverage)](https://sonarcloud.io/dashboard?id=vis2k_Mirror)
 [![Discord](https://img.shields.io/discord/343440455738064897.svg)](https://discordapp.com/invite/N9QVxbM)
@@ -14,7 +16,7 @@ Mirror is a **high level** Networking library for Unity, compatible with differe
 
 Mirror is for small indie games & large scale [MMOs](https://www.youtube.com/watch?v=mDCNff1S9ZU), made by the developers of [uMMORPG](https://assetstore.unity.com/packages/templates/systems/ummorpg-components-edition-159401) and [Cubica](https://www.youtube.com/watch?v=D_f_MntrLVE).
 
-Mirror is optimized for **ease of use** & **probability of success**. 
+Mirror is optimized for **ease of use** & **probability of success**.
 
 We needed a networking library that allows us to **[launch our games](https://mirror-networking.com/showcase/)** and **survive the next decade**.
 
@@ -41,9 +43,9 @@ _Note: Mirror is based on Unity's abandoned UNET Networking system. We fixed it 
 3. Type `https://github.com/VoltUnityPackages/Mirror.git?path=/Assets/Mirror` and add it
 4. Unity will now download and install the package
 
-Check out our [Documentation](https://mirror-networking.com/docs/) to learn how it all works.
+Check out our [Documentation](https://mirror-networking.gitbook.io/) to learn how it all works.
 
-If you are migrating from UNET, then please check out our [Migration Guide](https://mirror-networking.com/docs/Articles/General/Migration.html).
+If you are migrating from UNET, then please check out our [Migration Guide](https://mirror-networking.gitbook.io/docs/general/migration-guide).
 
 ## Made with Mirror
 
@@ -51,7 +53,7 @@ If you are migrating from UNET, then please check out our [Migration Guide](http
 [![Team-Capture](https://raw.githubusercontent.com/Voltstro-Studios/Team-Capture/master/tc-logo.png)](https://github.com/Voltstro-Studios/Team-Capture)
 
 ## Funding
-Mirror is free & open source software funded by Donations. If you love it, please consider supporting [Mirror on GitHub](https://github.com/sponsors/vis2k). As reward, you'll receive our [Network Profiler](https://mirror-networking.com/docs/Articles/Guides/Profiler.html?q=Profiler), priority support and more :)
+Mirror is free & open source software funded by Donations. If you love it, please consider supporting [Mirror on GitHub](https://github.com/sponsors/vis2k). As reward, you'll receive our [Network Profiler](https://mirror-networking.gitbook.io/docs/guides/network-profiler), priority support and more :)
 
 ## Benchmarks
 * [uMMORPG 480 CCU worst case test](https://youtu.be/mDCNff1S9ZU) (everyone broadcasting to everyone else)

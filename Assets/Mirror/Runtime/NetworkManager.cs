@@ -291,11 +291,6 @@ namespace Mirror
         /// </summary>
         public virtual void LateUpdate()
         {
-            // call it while the NetworkManager exists.
-            // -> we don't only call while Client/Server.Connected, because then we would stop if disconnected and the
-            //    NetworkClient wouldn't receive the last Disconnect event, result in all kinds of issues
-            NetworkServer.Update();
-            NetworkClient.Update();
             UpdateScene();
         }
 
@@ -650,7 +645,10 @@ namespace Mirror
 
             // Get Network Manager out of DDOL before going to offline scene
             // to avoid collision and let a fresh Network Manager be created.
-            if (gameObject.scene.name == "DontDestroyOnLoad"
+            // IMPORTANT: .gameObject can be null if StopClient is called from
+            //            OnApplicationQuit or from tests!
+            if (gameObject != null &&
+                gameObject.scene.name == "DontDestroyOnLoad"
                 && !string.IsNullOrEmpty(offlineScene)
                 && SceneManager.GetActiveScene().path != offlineScene)
                 SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
@@ -688,7 +686,10 @@ namespace Mirror
 
             // Get Network Manager out of DDOL before going to offline scene
             // to avoid collision and let a fresh Network Manager be created.
-            if (gameObject.scene.name == "DontDestroyOnLoad"
+            // IMPORTANT: .gameObject can be null if StopClient is called from
+            //            OnApplicationQuit or from tests!
+            if (gameObject != null &&
+                gameObject.scene.name == "DontDestroyOnLoad"
                 && !string.IsNullOrEmpty(offlineScene)
                 && SceneManager.GetActiveScene().path != offlineScene)
                 SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
