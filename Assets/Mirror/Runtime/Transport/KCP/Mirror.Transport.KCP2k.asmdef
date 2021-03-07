@@ -1,5 +1,6 @@
 {
     "name": "Mirror.Transport.KCP2k",
+    "rootNamespace": "Mirror.Transport.KCP2k",
     "references": [
         "Mirror"
     ],

@@ -1,9 +1,9 @@
 {
     "name": "WeaverTestExtraAssembly",
+    "rootNamespace": "Mirror.Weaver.Tests.Extra",
     "references": [
         "Mirror"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -12,5 +12,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

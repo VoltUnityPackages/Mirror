@@ -2,8 +2,11 @@
   "dependencies": {
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.unity.ide.rider": "2.0.7",
+    "com.unity.ide.visualstudio": "2.0.7",
     "com.unity.ide.vscode": "1.2.3",
     "com.unity.test-framework": "1.1.22",
+    "com.unity.test-framework.performance": "2.7.0-preview",
+    "com.unity.toolchain.win-x86_64-linux-x86_64": "0.1.19-preview",
     "com.unity.ugui": "1.0.0",
     "nuget.mono-cecil": "0.1.6-preview",
     "com.unity.modules.animation": "1.0.0",

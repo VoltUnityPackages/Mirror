@@ -1,12 +1,12 @@
 {
     "name": "Mirror.Tests.Runtime",
+    "rootNamespace": "Mirror.Tests.Runtime",
     "references": [
         "Mirror",
         "Mirror.Components",
-        "Mirror.Tests.Common"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "Mirror.Tests.Common",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -15,8 +15,13 @@
     "precompiledReferences": [
         "NSubstitute.dll",
         "Castle.Core.dll",
-        "System.Threading.Tasks.Extensions.dll"
+        "System.Threading.Tasks.Extensions.dll",
+        "nunit.framework.dll"
     ],
-    "autoReferenced": true,
-    "defineConstraints": []
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

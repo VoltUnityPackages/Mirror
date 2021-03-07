@@ -1,23 +1,25 @@
 {
     "name": "Mirror.Tests.Performance.Editor",
+    "rootNamespace": "Mirror.Tests.Performance.Editor",
     "references": [
-        "Unity.PerformanceTesting",
         "Mirror",
         "Mirror.Components",
-        "Mirror.Tests.Common"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "Mirror.Tests.Common",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
     "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
         "UNITY_INCLUDE_TESTS"
     ],
     "versionDefines": [
@@ -26,5 +28,6 @@
             "expression": "(,2.0)",
             "define": "UNITY_PERFORMANCE_TESTS_1_OR_OLDER"
         }
-    ]
+    ],
+    "noEngineReferences": false
 }

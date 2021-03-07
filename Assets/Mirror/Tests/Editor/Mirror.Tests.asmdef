@@ -1,5 +1,6 @@
 {
     "name": "Mirror.Tests",
+    "rootNamespace": "Mirror.Tests",
     "references": [
         "Mirror",
         "Mirror.Editor",

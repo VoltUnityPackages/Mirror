@@ -1,5 +1,6 @@
 {
     "name": "Mirror.Editor.Weaver",
+    "rootNamespace": "Mirror.Editor.Weaver",
     "references": [
         "Mirror"
     ],

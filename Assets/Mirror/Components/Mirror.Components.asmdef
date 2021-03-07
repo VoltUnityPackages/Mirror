@@ -1,6 +1,6 @@
 {
     "name": "Mirror.Components",
-    "rootNamespace": "",
+    "rootNamespace": "Mirror.Components",
     "references": [
         "Mirror",
         "UniTask"
