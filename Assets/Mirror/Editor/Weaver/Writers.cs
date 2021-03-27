@@ -32,7 +32,7 @@ namespace Mirror.Editor.Weaver
         {
             Register(typeReference, newWriterFunc);
 
-            Weaver.WeaveLists.generateContainerClass.Methods.Add(newWriterFunc);
+            Weaver.GeneratedCodeClass.Methods.Add(newWriterFunc);
         }
 
         /// <summary>

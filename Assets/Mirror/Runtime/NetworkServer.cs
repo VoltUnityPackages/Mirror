@@ -34,14 +34,8 @@ namespace Mirror
         public static bool active { get; internal set; }
 
         /// <summary>batch messages and send them out in LateUpdate (or after batchInterval)</summary>
-        // still optional until we improve mirror's update order.
-        // right now it increases latency because:
-        //   enabling batching flushes all state updates in same frame, but
-        //   transport processes incoming messages afterwards so server would
-        //   batch them until next frame's flush
-        // => disable it for super fast paced games
-        // => enable it for high scale / cpu heavy games
-        public static bool batching;
+        // (this is pretty much always a good idea)
+        public static bool batching = true;
 
         /// <summary>interval in seconds used for batching. 0 means send in every LateUpdate.</summary>
         public static float batchInterval = 0;
@@ -125,7 +119,7 @@ namespace Mirror
             RegisterMessageHandlers();
         }
 
-        // Note: ClientScene.DestroyAllClientObjects does the same on client.
+        // Note: NetworkClient.DestroyAllClientObjects does the same on client.
         static void CleanupNetworkIdentities()
         {
             foreach (NetworkIdentity identity in NetworkIdentity.spawned.Values)
@@ -231,7 +225,7 @@ namespace Mirror
 
         // send ////////////////////////////////////////////////////////////////
         /// <summary>Send a message to all clients, even those that haven't joined the world yet (non ready)</summary>
-        public static void SendToAll<T>(T message, int channelId = Channels.DefaultReliable, bool sendToReadyOnly = false)
+        public static void SendToAll<T>(T message, int channelId = Channels.Reliable, bool sendToReadyOnly = false)
             where T : struct, NetworkMessage
         {
             if (!active)
@@ -266,7 +260,7 @@ namespace Mirror
 
         /// <summary>Send a message to all clients which have joined the world (are ready).</summary>
         // TODO put rpcs into NetworkServer.Update WorldState packet, then finally remove SendToReady!
-        public static void SendToReady<T>(T message, int channelId = Channels.DefaultReliable)
+        public static void SendToReady<T>(T message, int channelId = Channels.Reliable)
             where T : struct, NetworkMessage
         {
             if (!active)
@@ -280,7 +274,7 @@ namespace Mirror
 
         /// <summary>Send a message to only clients which are ready with option to include the owner of the object identity</summary>
         // TODO put rpcs into NetworkServer.Update WorldState packet, then finally remove SendToReady!
-        public static void SendToReady<T>(NetworkIdentity identity, T message, bool includeOwner = true, int channelId = Channels.DefaultReliable)
+        public static void SendToReady<T>(NetworkIdentity identity, T message, bool includeOwner = true, int channelId = Channels.Reliable)
             where T : struct, NetworkMessage
         {
             // Debug.Log("Server.SendToReady msgType:" + typeof(T));
@@ -318,7 +312,7 @@ namespace Mirror
 
         // this is like SendToReady - but it doesn't check the ready flag on the connection.
         // this is used for ObjectDestroy messages.
-        static void SendToObservers<T>(NetworkIdentity identity, T message, int channelId = Channels.DefaultReliable)
+        static void SendToObservers<T>(NetworkIdentity identity, T message, int channelId = Channels.Reliable)
             where T : struct, NetworkMessage
         {
             // Debug.Log("Server.SendToObservers id:" + typeof(T));
@@ -342,7 +336,7 @@ namespace Mirror
 
         /// <summary>Send this message to the player only</summary>
         [Obsolete("Use identity.connectionToClient.Send() instead! Previously Mirror needed this function internally, but not anymore.")]
-        public static void SendToClientOfPlayer<T>(NetworkIdentity identity, T msg, int channelId = Channels.DefaultReliable)
+        public static void SendToClientOfPlayer<T>(NetworkIdentity identity, T msg, int channelId = Channels.Reliable)
             where T : struct, NetworkMessage
         {
             if (identity != null)
@@ -571,7 +565,7 @@ namespace Mirror
             if (conn is LocalConnectionToClient)
             {
                 identity.hasAuthority = true;
-                ClientScene.InternalAddPlayer(identity);
+                NetworkClient.InternalAddPlayer(identity);
             }
 
             // set ready if not set yet
@@ -631,7 +625,7 @@ namespace Mirror
             if (conn is LocalConnectionToClient)
             {
                 identity.hasAuthority = true;
-                ClientScene.InternalAddPlayer(identity);
+                NetworkClient.InternalAddPlayer(identity);
             }
 
             // add connection to observers AFTER the playerController was set.
