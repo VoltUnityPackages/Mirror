@@ -69,7 +69,7 @@ public class NullTransport : Transport
         throw new NotImplementedException();
     }
 
-    public override int GetMaxPacketSize(int channelId = Channels.DefaultReliable)
+    public override int GetMaxPacketSize(int channelId = Channels.Reliable)
     {
         throw new NotImplementedException();
     }
