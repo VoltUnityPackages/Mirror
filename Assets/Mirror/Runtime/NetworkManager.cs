@@ -12,7 +12,7 @@ namespace Mirror
 
     [DisallowMultipleComponent]
     [AddComponentMenu("Network/NetworkManager")]
-    [HelpURL("https://mirror-networking.com/docs/Articles/Components/NetworkManager.html")]
+    [HelpURL("https://mirror-networking.gitbook.io/docs/components/network-manager")]
     public class NetworkManager : MonoBehaviour
     {
         /// <summary>Enable to keep NetworkManager alive when changing scenes.</summary>
@@ -170,8 +170,15 @@ namespace Mirror
 
             if (playerPrefab != null && playerPrefab.GetComponent<NetworkIdentity>() == null)
             {
-                Debug.LogError("NetworkManager - playerPrefab must have a NetworkIdentity.");
+                Debug.LogError("NetworkManager - Player Prefab must have a NetworkIdentity.");
                 playerPrefab = null;
+            }
+
+            // This avoids the mysterious "Replacing existing prefab with assetId ... Old prefab 'Player', New prefab 'Player'" warning.
+            if (playerPrefab != null && spawnPrefabs.Contains(playerPrefab))
+            {
+                Debug.LogWarning("NetworkManager - Player Prefab should not be added to Registered Spawnable Prefabs list...removed it.");
+                spawnPrefabs.Remove(playerPrefab);
             }
         }
 
@@ -1132,7 +1139,7 @@ namespace Mirror
             if (authenticator != null)
             {
                 // we have an authenticator - let it handle authentication
-                authenticator.OnClientAuthenticate(NetworkClient.connection);
+                authenticator.OnClientAuthenticate();
             }
             else
             {
@@ -1207,7 +1214,7 @@ namespace Mirror
             NetworkServer.SetClientReady(conn);
         }
 
-        /// <summary>Called on server when a client requests to add the player. Adds playerPrefab by default. Can be overwritte.</summary>
+        /// <summary>Called on server when a client requests to add the player. Adds playerPrefab by default. Can be overwritten.</summary>
         // The default implementation for this function creates a new player object from the playerPrefab.
         public virtual void OnServerAddPlayer(NetworkConnection conn)
         {
