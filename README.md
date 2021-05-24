@@ -47,15 +47,6 @@ Making multiplayer games this way is fun & easy. Instead of MonoBehaviour, Mirro
 * **[ClientRpc]** / **[TargetRpc]** for Server->Client function calls (e.g. AddChatMessage)
 * **[SyncVar]** / SyncList to automatically synchronize variables from Server->Client
 
-<<<<<<< HEAD
-_Note: Mirror is based on Unity's abandoned UNET Networking system. We fixed it up and pushed it to MMO Scale._
-
-## Low Level Transports
-* (Built In) [KCP](https://github.com/skywind3000/kcp): reliable UDP
-* (Package) [Ignorance](https://github.com/VoltUnityPackages/Ignorance): ENET UDP
-
-=======
->>>>>>> master
 ## Getting Started
 1. Open up the package manager via Windows **->** Package Manager
 2. Click on the little + sign **->** Add package from git URL...
@@ -67,11 +58,6 @@ Check out our [Documentation](https://mirror-networking.gitbook.io/) to learn ho
 If you are migrating from UNET, then please check out our [Migration Guide](https://mirror-networking.gitbook.io/docs/general/migration-guide).
 
 ## Made with Mirror
-<<<<<<< HEAD
-
-[Team-Capture](https://github.com/Voltstro-Studios/Team-Capture)
-[![Team-Capture](https://raw.githubusercontent.com/Voltstro-Studios/Team-Capture/master/tc-logo.png)](https://github.com/Voltstro-Studios/Team-Capture)
-=======
 <table align="center">
   <tr>
     <th><a href="http://www.populationonevr.com/">Population: ONE</a></th>
@@ -110,7 +96,6 @@ If you are migrating from UNET, then please check out our [Migration Guide](http
     <td><img src="https://i.ytimg.com/vi/D_f_MntrLVE/maxresdefault.jpg" height="100"/></td>
   </tr>
 </table>
->>>>>>> master
 
 And [many more](https://mirror-networking.com/showcase/)...
 
