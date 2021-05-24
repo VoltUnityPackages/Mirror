@@ -64,6 +64,23 @@ namespace Mirror
         }
 
         /// <summary>Disconnects this connection.</summary>
+        // for future reference, here is how Disconnects work in Mirror.
+        //
+        // first, there are two types of disconnects:
+        // * voluntary: the other end simply disconnected
+        // * involuntary: server disconnects a client by itself
+        //
+        // UNET had special (complex) code to handle both cases differently.
+        //
+        // Mirror handles both cases the same way:
+        // * Disconnect is called from TOP to BOTTOM
+        //   NetworkServer/Client -> NetworkConnection -> Transport.Disconnect()
+        // * Disconnect is handled from BOTTOM to TOP
+        //   Transport.OnDisconnected -> ...
+        //
+        // in other words, calling Disconnect() does no cleanup whatsoever.
+        // it simply asks the transport to disconnect.
+        // then later the transport events will do the clean up.
         public abstract void Disconnect();
 
         internal void SetHandlers(Dictionary<ushort, NetworkMessageDelegate> handlers)
@@ -136,7 +153,7 @@ namespace Mirror
         }
 
         // TODO move to server's NetworkConnectionToClient?
-        internal void RemoveObservers()
+        internal void RemoveFromObservingsObservers()
         {
             foreach (NetworkIdentity netIdentity in observing)
             {
@@ -171,8 +188,8 @@ namespace Mirror
             }
         }
 
-        // called when receiving data from the transport
-        internal void TransportReceive(ArraySegment<byte> buffer, int channelId)
+        // called by NetworkServer/NetworkClient OnTransportData
+        internal void OnTransportData(ArraySegment<byte> buffer, int channelId)
         {
             if (buffer.Count < MessagePacking.HeaderSize)
             {

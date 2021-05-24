@@ -126,26 +126,7 @@ namespace Mirror
             new Dictionary<uint, NetworkIdentity>();
 
         // get all NetworkBehaviour components
-        // => currently lazily initialized so tests can add components after
-        //    creating a NetworkIdentity.
-        NetworkBehaviour[] _NetworkBehaviours;
-        public NetworkBehaviour[] NetworkBehaviours
-        {
-            get
-            {
-                if (_NetworkBehaviours == null)
-                {
-                    _NetworkBehaviours = GetComponents<NetworkBehaviour>();
-                    if (_NetworkBehaviours.Length > byte.MaxValue)
-                    {
-                        Debug.LogError($"Only {byte.MaxValue} NetworkBehaviour components are allowed for NetworkIdentity: {name} because we send the index as byte.", this);
-                        // Log error once then resize array so that NetworkIdentity does not throw exceptions later
-                        Array.Resize(ref _NetworkBehaviours, byte.MaxValue);
-                    }
-                }
-                return _NetworkBehaviours;
-            }
-        }
+        public NetworkBehaviour[] NetworkBehaviours { get; private set; }
 
 #pragma warning disable 618
         NetworkVisibility visibilityCache;
@@ -276,8 +257,36 @@ namespace Mirror
         [SerializeField, HideInInspector] bool hasSpawned;
         public bool SpawnedFromInstantiate { get; private set; }
 
-        void Awake()
+        // NetworkBehaviour components are initialized in Awake once.
+        // Changing them at runtime would get client & server out of sync.
+        // BUT internal so tests can add them after creating the NetworkIdentity
+        internal void InitializeNetworkBehaviours()
         {
+            // Get all NetworkBehaviours
+            // (never null. GetComponents returns [] if none found)
+            NetworkBehaviours = GetComponents<NetworkBehaviour>();
+            if (NetworkBehaviours.Length > byte.MaxValue)
+                Debug.LogError($"Only {byte.MaxValue} NetworkBehaviour components are allowed for NetworkIdentity: {name} because we send the index as byte.", this);
+
+            // initialize each one
+            for (int i = 0; i < NetworkBehaviours.Length; ++i)
+            {
+                NetworkBehaviour component = NetworkBehaviours[i];
+                component.netIdentity = this;
+                component.ComponentIndex = i;
+            }
+        }
+
+        // Awake is only called in Play mode.
+        // internal so we can call it during unit tests too.
+        internal void Awake()
+        {
+            // initialize NetworkBehaviour components.
+            // Awake() is called immediately after initialization.
+            // no one can overwrite it because NetworkIdentity is sealed.
+            // => doing it here is the fastest and easiest solution.
+            InitializeNetworkBehaviours();
+
             if (hasSpawned)
             {
                 Debug.LogError($"{name} has already spawned. Don't call Instantiate for NetworkIdentities that were in the scene since the beginning (aka scene objects).  Otherwise the client won't know which object to use for a SpawnSceneObject message.");
@@ -816,7 +825,7 @@ namespace Mirror
             // (jumping back later is WAY faster than allocating a temporary
             //  writer for the payload, then writing payload.size, payload)
             int headerPosition = writer.Position;
-            writer.WriteInt32(0);
+            writer.WriteInt(0);
             int contentPosition = writer.Position;
 
             // write payload
@@ -834,7 +843,7 @@ namespace Mirror
 
             // fill in length now
             writer.Position = headerPosition;
-            writer.WriteInt32(endPosition - contentPosition);
+            writer.WriteInt(endPosition - contentPosition);
             writer.Position = endPosition;
 
             // Debug.Log("OnSerializeSafely written for object=" + comp.name + " component=" + comp.GetType() + " sceneId=" + sceneId.ToString("X") + "header@" + headerPosition + " content@" + contentPosition + " end@" + endPosition + " contentSize=" + (endPosition - contentPosition));
@@ -903,7 +912,7 @@ namespace Mirror
         void OnDeserializeSafely(NetworkBehaviour comp, NetworkReader reader, bool initialState)
         {
             // read header as 4 bytes and calculate this chunk's start+end
-            int contentSize = reader.ReadInt32();
+            int contentSize = reader.ReadInt();
             int chunkStart = reader.Position;
             int chunkEnd = reader.Position + contentSize;
 
@@ -1113,6 +1122,10 @@ namespace Mirror
             }
         }
 
+        // Reset is called when the user hits the Reset button in the
+        // Inspector's context menu or when adding the component the first time.
+        // This function is only called in editor mode.
+        //
         // Reset() seems to be called only for Scene objects.
         // we can't destroy them (they are always in the scene).
         // instead we disable them and call Reset().
@@ -1136,7 +1149,6 @@ namespace Mirror
             netId = 0;
             connectionToServer = null;
             connectionToClient = null;
-            _NetworkBehaviours = null;
 
             ClearObservers();
 
@@ -1177,6 +1189,13 @@ namespace Mirror
 
         void ResetSyncObjects()
         {
+            // ResetSyncObjects is called by Reset, which is called by Unity.
+            // AddComponent() calls Reset().
+            // AddComponent() is called before Awake().
+            // so NetworkBehaviours may not be initialized yet.
+            if (NetworkBehaviours == null)
+                return;
+
             foreach (NetworkBehaviour comp in NetworkBehaviours)
             {
                 comp.ResetSyncObjects();

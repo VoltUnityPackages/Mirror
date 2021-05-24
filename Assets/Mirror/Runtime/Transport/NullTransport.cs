@@ -24,11 +24,6 @@ public class NullTransport : Transport
         throw new NotImplementedException();
     }
 
-    public override void ClientSend(int channelId, ArraySegment<byte> segment)
-    {
-        throw new NotImplementedException();
-    }
-
     public override void ClientDisconnect()
     {
         throw new NotImplementedException();
@@ -49,12 +44,7 @@ public class NullTransport : Transport
         throw new NotImplementedException();
     }
 
-    public override void ServerSend(int connectionId, int channelId, ArraySegment<byte> segment)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override bool ServerDisconnect(int connectionId)
+    public override void ServerDisconnect(int connectionId)
     {
         throw new NotImplementedException();
     }

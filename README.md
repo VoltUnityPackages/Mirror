@@ -1,26 +1,42 @@
-![Mirror Logo](https://i.imgur.com/we6li1x.png)
+![mMirror Logo](https://user-images.githubusercontent.com/16416509/119120944-6db26780-ba5f-11eb-9cdd-fc8500207f4d.png)
+
 
 [![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://mirror-networking.gitbook.io/)
 [![Forum](https://img.shields.io/badge/forum-brightgreen.svg)](https://forum.unity.com/threads/mirror-networking-for-unity-aka-hlapi-community-edition.425437/)
 [![Build](https://img.shields.io/appveyor/ci/vis2k73562/hlapi-community-edition/Mirror.svg)](https://ci.appveyor.com/project/vis2k73562/hlapi-community-edition/branch/mirror)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vis2k_Mirror&metric=coverage)](https://sonarcloud.io/dashboard?id=vis2k_Mirror)
 [![Discord](https://img.shields.io/discord/343440455738064897.svg)](https://discordapp.com/invite/N9QVxbM)
 [![release](https://img.shields.io/github/release/vis2k/Mirror.svg)](https://github.com/vis2k/Mirror/releases/latest)
 [![Roadmap](https://img.shields.io/badge/roadmap-blue.svg)](https://trello.com/b/fgAE7Tud)
 [![Documentation](https://img.shields.io/badge/docs-blue.svg)](https://mirror-networking.com/docs)
 
-**Stop worrying about networking. Because we do.**
+**It's only the dreamers who ever move mountains.**
 
-## Mirror Package
-Mirror is a **high level** Networking library for Unity, compatible with different **low level** [Transports](https://github.com/vis2k/Mirror#low-level-transports).
+<img src="https://user-images.githubusercontent.com/16416509/119117854-3e4e2b80-ba5c-11eb-8236-ce6cfd2b6b07.png" title="Original Concept Art for Games that made us dream. Copyright Blizzard, Blizzard, Riot Games, Joymax in that order."/>
 
-Mirror is for small indie games & large scale [MMOs](https://www.youtube.com/watch?v=mDCNff1S9ZU), made by the developers of [uMMORPG](https://assetstore.unity.com/packages/templates/systems/ummorpg-components-edition-159401) and [Cubica](https://www.youtube.com/watch?v=D_f_MntrLVE).
+## Mirror
+Mirror is a **high level** Networking library for **Unity 2019/2020 LTS**, compatible with different **low level** [Transports](https://github.com/vis2k/Mirror#low-level-transports).
+
+Mirror is for indie games & small [MMOs](https://www.youtube.com/watch?v=mDCNff1S9ZU), made by the developers of [uMMORPG](https://assetstore.unity.com/packages/templates/systems/ummorpg-components-edition-159401) and [Cubica](https://www.youtube.com/watch?v=D_f_MntrLVE).
 
 Mirror is optimized for **ease of use** & **probability of success**.
 
 We needed a networking library that allows us to **[launch our games](https://mirror-networking.com/showcase/)** and **survive the next decade**.
 
+Mirror is **[stable](https://mirror-networking.gitbook.io/docs/general/tests)** & **[production](https://www.oculus.com/experiences/quest/2564158073609422/)** ready.
+
 This is a fork of [Mirror](https://github.com/vis2k/Mirror), adding the ability to install it via the package manager. This makes it easier to update. Updates from [upstream](https://github.com/vis2k/Mirror) are periodically merged in, this also means that this packages is always using the latest bleeding edge version of Mirror. If you want a more stable version, use the [asset store version](https://assetstore.unity.com/packages/tools/network/mirror-129321).
+
+Please also note that a lot has been changed for my project's needs. A lot of "fat" (extra transports) has been trimmed out.
+
+## Free & Open
+Mirror is **free & open source**!
+* Code: MIT licensed.
+* Dedicated Servers: [Anywhere](https://mirror-networking.gitbook.io/docs/guides/server-hosting)!
+* Player Hosted: [Free Epic Relay](https://github.com/FakeByte/EpicOnlineTransport)!
+
+We need Mirror for our own games, which is why we will never charge anything. 
+
+Funded only by [Donations](https://github.com/sponsors/vis2k) from our [fantastic community](https://discordapp.com/invite/N9QVxbM) of over 10,000 people.
 
 ## Architecture
 The **Server & Client** are **ONE project** in order to achieve an order of magnitude gain in productivity.
@@ -31,12 +47,15 @@ Making multiplayer games this way is fun & easy. Instead of MonoBehaviour, Mirro
 * **[ClientRpc]** / **[TargetRpc]** for Server->Client function calls (e.g. AddChatMessage)
 * **[SyncVar]** / SyncList to automatically synchronize variables from Server->Client
 
+<<<<<<< HEAD
 _Note: Mirror is based on Unity's abandoned UNET Networking system. We fixed it up and pushed it to MMO Scale._
 
 ## Low Level Transports
 * (Built In) [KCP](https://github.com/skywind3000/kcp): reliable UDP
 * (Package) [Ignorance](https://github.com/VoltUnityPackages/Ignorance): ENET UDP
 
+=======
+>>>>>>> master
 ## Getting Started
 1. Open up the package manager via Windows **->** Package Manager
 2. Click on the little + sign **->** Add package from git URL...
@@ -48,30 +67,80 @@ Check out our [Documentation](https://mirror-networking.gitbook.io/) to learn ho
 If you are migrating from UNET, then please check out our [Migration Guide](https://mirror-networking.gitbook.io/docs/general/migration-guide).
 
 ## Made with Mirror
+<<<<<<< HEAD
 
 [Team-Capture](https://github.com/Voltstro-Studios/Team-Capture)
 [![Team-Capture](https://raw.githubusercontent.com/Voltstro-Studios/Team-Capture/master/tc-logo.png)](https://github.com/Voltstro-Studios/Team-Capture)
+=======
+<table align="center">
+  <tr>
+    <th><a href="http://www.populationonevr.com/">Population: ONE</a></th>
+    <th><a href="https://wildlifestudios.com/games/zooba/">Zooba</a></th>
+    <th><a href="https://store.steampowered.com/app/700330/SCP_Secret_Laboratory/">SCP: Secret Laboratory</a></th>
+    <th><a href="https://naicaonline.com/">Naïca Online</a></th>
+  </tr>
+  <tr>
+    <td><img src="https://steamcdn-a.akamaihd.net/steam/apps/691260/header.jpg?t=1603846067" height="100"/></td>
+    <td><img src="https://user-images.githubusercontent.com/16416509/119125684-ac96ec00-ba64-11eb-9c0c-c6595e00dec8.png" height="100"/></td>
+    <td><img src="https://steamcdn-a.akamaihd.net/steam/apps/700330/header.jpg?t=1604668607" height="100"/></td>
+    <td><img src="https://i.imgur.com/VrBqvtz.png" height="100"/></td>
+  </tr>
+  <tr>
+    <th><a href="https://laurum.online/">Laurum Online</a></th>
+    <th><a href="https://www.samutale.com/">SamuTale</a></th>
+    <th><a href="https://store.steampowered.com/app/1313210/Nimoyd__Survival_Sandbox/">Nimoyd</a></th>
+    <th><a href="https://store.steampowered.com/app/719200/The_Wall/">The Wall</a></th>
+  </tr>
+  <tr>
+    <td><img src="https://camo.githubusercontent.com/6d50af6cbe0fcfc465f444f75475a356c6c14b4a3a9534156cfdd578e7d45a9f/68747470733a2f2f692e696d6775722e636f6d2f324938776e784f2e706e67" height="100"/></td>
+    <td><img src="https://user-images.githubusercontent.com/16416509/119000119-65a1eb80-b9bd-11eb-9d8b-5fdc5a6e28e3.png" height="100"/></td>
+    <td><img src="https://cdn.akamai.steamstatic.com/steam/apps/1313210/header.jpg?t=1616227358" height="100"/></td>
+    <td><img src="https://cdn.akamai.steamstatic.com/steam/apps/719200/header.jpg?t=1588105839" height="100"/></td>
+  </tr>
+  <tr>
+    <th><a href="https://nestables.co/">Nestables</a></th>
+    <th><a href="https://www.glimpse-luna.com/">A Glimpse of Luna</a></th>
+    <th><a href="https://store.steampowered.com/app/535630/One_More_Night/">One More Night</a></th>
+    <th><a href="">Cubica</a></th>
+  </tr>
+  <tr>
+    <td><img src="https://user-images.githubusercontent.com/16416509/119001349-7a32b380-b9be-11eb-86fd-a116920842d1.png" height="100"/></td>
+    <td><img src="https://user-images.githubusercontent.com/16416509/119001595-b0703300-b9be-11eb-9e40-6542113dc1a2.png" height="100"/></td>
+    <td><img src="https://cdn.akamai.steamstatic.com/steam/apps/535630/header.jpg?t=1584831320" height="100"/></td>
+    <td><img src="https://i.ytimg.com/vi/D_f_MntrLVE/maxresdefault.jpg" height="100"/></td>
+  </tr>
+</table>
+>>>>>>> master
 
 And [many more](https://mirror-networking.com/showcase/)...
 
-## Funding
-Mirror is free & open source software funded by [Donations](https://github.com/sponsors/vis2k). If you love it, please consider supporting [Mirror on GitHub](https://github.com/sponsors/vis2k). As reward, you'll receive our [Network Profiler](https://mirror-networking.gitbook.io/docs/guides/network-profiler), priority support and more :)
+## Low Level Transports
+* (built in) [KCP](https://app.gitbook.com/@mirror-networking/s/docs/transports/kcp-transport): reliable UDP
+* (built in) [Telepathy](https://app.gitbook.com/@mirror-networking/s/docs/transports/telepathy-transport): TCP
+* (built in) [Websockets](https://app.gitbook.com/@mirror-networking/s/docs/transports/websockets-transport): Websockets
+* [Ignorance](https://github.com/SoftwareGuy/Ignorance/): ENET UDP
+* [LiteNetLib](https://github.com/MirrorNetworking/LiteNetLibTransport/) UDP
+* [FizzySteam](https://github.com/Chykary/FizzySteamworks/): SteamNetwork
+* [FizzyFacepunch](https://github.com/Chykary/FizzyFacepunch/): SteamNetwork
+* [Epic Relay](https://github.com/FakeByte/EpicOnlineTransport): Epic Online Services
+* [Light Reflective Mirror](https://github.com/Derek-R-S/Light-Reflective-Mirror): Self-Hosted Relay
+* [Oculus P2P](https://github.com/hyferg/MirrorOculusP2P): Oculus Platform Service
 
 ## Benchmarks
-* [uMMORPG 480 CCU worst case test](https://youtu.be/mDCNff1S9ZU) (everyone broadcasting to everyone else)
-* [Latest Results](https://docs.google.com/document/d/1GMxcWAz3ePt3RioK8k4erpVSpujMkYje4scOuPwM8Ug/edit?usp=sharing)
+* [uMMORPG 480 CCU](https://youtu.be/mDCNff1S9ZU) (worst case)
+* [Jesus' Benchmarks](https://docs.google.com/document/d/1GMxcWAz3ePt3RioK8k4erpVSpujMkYje4scOuPwM8Ug/edit?usp=sharing)
 
 ## Development & Contributing
-Mirror is used **in production** by games ranging from small indie projects to large scale MMOs that will run for a decade or more.
+Mirror is used **in production** by everything from small indie projects to million dollar funded games that will run for a decade or more.
 
-10 years from now if your players encounter a networking bug and most of our contributors already moved on, someone will need to fix it. Therefore it is of utmost importance for us to follow the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle) in order for our games to survive.
+Therefore it is of utmost importance for us to follow the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle) in order for our games to survive, so that we can still fix networking bugs 10 years from now if needed.
 
 Keeping the next decade in mind, contributing **fixes** / **tests** / **improvements** is highly appreciated while new features have a low probability of being merged.
 
 _At this point, what we don't add to Mirror is more important than what we do add to it!_
 
 # Bug Bounty
-<img width="470" src="https://user-images.githubusercontent.com/16416509/110572995-718b5900-8195-11eb-802c-235c82a03bf7.png">
+<img src="https://user-images.githubusercontent.com/16416509/110572995-718b5900-8195-11eb-802c-235c82a03bf7.png" height="150">
 
 A lot of projects use Mirror in production. If you found a critical bug / exploit in Mirror core, please reach out to us in private.
 Depending on the severity of the exploit, we offer $50 - $500 for now.
