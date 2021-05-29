@@ -1,8 +1,8 @@
-﻿// Pool to avoid allocations (from libuv2k)
+﻿// Pool to avoid allocations (from libuv2k & Mirror)
 using System;
 using System.Collections.Generic;
 
-namespace Mirror
+namespace kcp2k
 {
     public class Pool<T>
     {
@@ -13,9 +13,13 @@ namespace Mirror
         // we use a Func<T> generator
         readonly Func<T> objectGenerator;
 
-        public Pool(Func<T> objectGenerator, int initialCapacity)
+        // some types might need additional cleanup for returned objects
+        readonly Action<T> objectResetter;
+
+        public Pool(Func<T> objectGenerator, Action<T> objectResetter, int initialCapacity)
         {
             this.objectGenerator = objectGenerator;
+            this.objectResetter = objectResetter;
 
             // allocate an initial pool so we have fewer (if any)
             // allocations in the first few frames (or seconds).
@@ -27,7 +31,14 @@ namespace Mirror
         public T Take() => objects.Count > 0 ? objects.Pop() : objectGenerator();
 
         // return an element to the pool
-        public void Return(T item) => objects.Push(item);
+        public void Return(T item)
+        {
+            objectResetter(item);
+            objects.Push(item);
+        }
+
+        // clear the pool
+        public void Clear() => objects.Clear();
 
         // count to see how many objects are in the pool. useful for tests.
         public int Count => objects.Count;

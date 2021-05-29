@@ -1,10 +1,11 @@
 // base class for networking tests to make things easier.
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 namespace Mirror.Tests
 {
+    // inherited by MirrorEditModeTest / MirrorPlayModeTest
+    // to call SetUp/TearDown by [SetUp]/[UnitySetUp] as needed
     public abstract class MirrorTest
     {
         // keep track of networked GameObjects so we don't have to clean them
@@ -15,7 +16,6 @@ namespace Mirror.Tests
         // we usually need the memory transport
         public MemoryTransport transport;
 
-        [SetUp]
         public virtual void SetUp()
         {
             instantiated = new List<GameObject>();
@@ -24,7 +24,6 @@ namespace Mirror.Tests
             Transport.activeTransport = transport = new GameObject().AddComponent<MemoryTransport>();
         }
 
-        [TearDown]
         public virtual void TearDown()
         {
             foreach (GameObject go in instantiated)

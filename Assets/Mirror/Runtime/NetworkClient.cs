@@ -17,7 +17,7 @@ namespace Mirror
     public static class NetworkClient
     {
         // message handlers by messageId
-        static readonly Dictionary<ushort, NetworkMessageDelegate> handlers =
+        internal static readonly Dictionary<ushort, NetworkMessageDelegate> handlers =
             new Dictionary<ushort, NetworkMessageDelegate>();
 
         /// <summary>Client's NetworkConnection to server.</summary>
@@ -57,8 +57,11 @@ namespace Mirror
         /// <summary>Check if client is connected (after connecting).</summary>
         public static bool isConnected => connectState == ConnectState.Connected;
 
-        /// <summary>NetworkClient can connect to local server in host mode too</summary>
-        public static bool isLocalClient => connection is LocalConnectionToServer;
+        /// <summary>True if client is running in host mode.</summary>
+        public static bool isHostClient => connection is LocalConnectionToServer;
+        // Deprecated 2021-05-26
+        [Obsolete("isLocalClient was renamed to isHostClient because that's what it actually means.")]
+        public static bool isLocalClient => isHostClient;
 
         // OnConnected / OnDisconnected used to be NetworkMessages that were
         // invoked. this introduced a bug where external clients could send
@@ -109,7 +112,7 @@ namespace Mirror
                 // host mode doesn't need spawning
                 RegisterHandler<ObjectSpawnFinishedMessage>(msg => {});
                 // host mode doesn't need state updates
-                RegisterHandler<UpdateVarsMessage>(msg => {});
+                RegisterHandler<EntityStateMessage>(msg => {});
             }
             else
             {
@@ -119,7 +122,7 @@ namespace Mirror
                 RegisterHandler<SpawnMessage>(OnSpawn);
                 RegisterHandler<ObjectSpawnStartedMessage>(OnObjectSpawnStarted);
                 RegisterHandler<ObjectSpawnFinishedMessage>(OnObjectSpawnFinished);
-                RegisterHandler<UpdateVarsMessage>(OnUpdateVarsMessage);
+                RegisterHandler<EntityStateMessage>(OnEntityStateMessage);
             }
             RegisterHandler<RpcMessage>(OnRPCMessage);
         }
@@ -138,9 +141,7 @@ namespace Mirror
             connectState = ConnectState.Connecting;
             Transport.activeTransport.ClientConnect(address);
 
-            // setup all the handlers
             connection = new NetworkConnectionToServer();
-            connection.SetHandlers(handlers);
         }
 
         /// <summary>Connect client to a NetworkServer by Uri.</summary>
@@ -156,9 +157,7 @@ namespace Mirror
             connectState = ConnectState.Connecting;
             Transport.activeTransport.ClientConnect(uri);
 
-            // setup all the handlers
             connection = new NetworkConnectionToServer();
-            connection.SetHandlers(handlers);
         }
 
         // TODO why are there two connect host methods?
@@ -178,7 +177,6 @@ namespace Mirror
             connectionToClient.connectionToServer = connectionToServer;
 
             connection = connectionToServer;
-            connection.SetHandlers(handlers);
 
             // create server connection to local client
             NetworkServer.SetLocalConnection(connectionToClient);
@@ -215,7 +213,7 @@ namespace Mirror
             ready = false;
 
             // call Disconnect on the NetworkConnection
-            connection.Disconnect();
+            connection?.Disconnect();
 
             // clean up
             // (previously only for remote connection, not for local)
@@ -256,12 +254,55 @@ namespace Mirror
             else Debug.LogError("Skipped Connect message handling because connection is null.");
         }
 
+        // helper function
+        static bool UnpackAndInvoke(NetworkReader reader, int channelId)
+        {
+            if (MessagePacking.Unpack(reader, out ushort msgType))
+            {
+                // try to invoke the handler for that message
+                if (handlers.TryGetValue(msgType, out NetworkMessageDelegate handler))
+                {
+                    handler.Invoke(connection, reader, channelId);
+                    connection.lastMessageTime = Time.time;
+                    return true;
+                }
+                else
+                {
+                    // Debug.Log("Unknown message ID " + msgType + " " + this + ". May be due to no existing RegisterHandler for this message.");
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.LogError("Closed connection: " + connection + ". Invalid message header.");
+                connection.Disconnect();
+                return false;
+            }
+        }
+
         // called by Transport
         internal static void OnTransportData(ArraySegment<byte> data, int channelId)
         {
             if (connection != null)
             {
-                connection.OnTransportData(data, channelId);
+                if (data.Count < MessagePacking.HeaderSize)
+                {
+                    Debug.LogError($"NetworkClient: received Message was too short (messages should start with message id)");
+                    connection.Disconnect();
+                    return;
+                }
+
+                // unpack message
+                using (PooledNetworkReader reader = NetworkReaderPool.GetReader(data))
+                {
+                    // server might batch multiple messages into one packet.
+                    // we need to try to unpack multiple times.
+                    while (reader.Position < reader.Length)
+                    {
+                        if (!UnpackAndInvoke(reader, channelId))
+                            break;
+                    }
+                }
             }
             else Debug.LogError("Skipped Data message handling because connection is null.");
         }
@@ -1107,7 +1148,7 @@ namespace Mirror
         }
 
         // client-only mode callbacks //////////////////////////////////////////
-        static void OnUpdateVarsMessage(UpdateVarsMessage message)
+        static void OnEntityStateMessage(EntityStateMessage message)
         {
             // Debug.Log("NetworkClient.OnUpdateVarsMessage " + msg.netId);
             if (NetworkIdentity.spawned.TryGetValue(message.netId, out NetworkIdentity localObject) && localObject != null)
