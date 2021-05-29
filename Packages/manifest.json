@@ -10,7 +10,7 @@
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.toolchain.win-x86_64-linux-x86_64": "0.1.20-preview",
     "com.unity.ugui": "1.0.0",
-    "nuget.mono-cecil": "0.1.6-preview",
+    "com.unity.nuget.mono-cecil": "1.10.1",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.imgui": "1.0.0",
     "com.unity.modules.jsonserialize": "1.0.0",
