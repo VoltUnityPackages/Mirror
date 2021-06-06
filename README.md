@@ -52,8 +52,9 @@ Making multiplayer games this way is fun & easy. Instead of MonoBehaviour, Mirro
 2. Install [UniTask](https://github.com/Cysharp/UniTask#upm-package)
 3. Open up the package manager via Windows **->** Package Manager
 4. Click on the little + sign **->** Add package from git URL...
-5. Type `https://github.com/VoltUnityPackages/Mirror.git?path=/Assets/Mirror` and add it
-6. Unity will now download and install the package
+5. Add `https://github.com/VoltUnityPackages/UnitySystemBuffers.git`
+6. Add `https://github.com/VoltUnityPackages/UnitySystemThreadingTasksExtensions.git`
+7. Add `https://github.com/VoltUnityPackages/Mirror.git?path=/Assets/Mirror`
 
 Check out our [Documentation](https://mirror-networking.gitbook.io/) to learn how it all works.
 
