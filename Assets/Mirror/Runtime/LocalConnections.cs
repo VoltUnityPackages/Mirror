@@ -6,11 +6,11 @@ namespace Mirror
 {
     // a server's connection TO a LocalClient.
     // sending messages on this connection causes the client's handler function to be invoked directly
-    class LocalConnectionToClient : NetworkConnectionToClient
+    public class LocalConnectionToClient : NetworkConnectionToClient
     {
         internal LocalConnectionToServer connectionToServer;
 
-        public LocalConnectionToClient() : base(LocalConnectionId, false, 0) {}
+        public LocalConnectionToClient() : base(LocalConnectionId, false) {}
 
         public override string address => "localhost";
 
@@ -48,7 +48,7 @@ namespace Mirror
 
     // a localClient's connection TO a server.
     // send messages on this connection causes the server's handler function to be invoked directly.
-    internal class LocalConnectionToServer : NetworkConnectionToServer
+    public class LocalConnectionToServer : NetworkConnectionToServer
     {
         internal LocalConnectionToClient connectionToClient;
 
@@ -63,6 +63,9 @@ namespace Mirror
         internal void QueueConnectedEvent() => connectedEventPending = true;
         internal void QueueDisconnectedEvent() => disconnectedEventPending = true;
 
+        // parameterless constructor that disables batching for local connections
+        public LocalConnectionToServer() : base(false) {}
+
         internal override void Send(ArraySegment<byte> segment, int channelId = Channels.Reliable)
         {
             if (segment.Count == 0)
@@ -75,8 +78,10 @@ namespace Mirror
             NetworkServer.OnTransportData(connectionId, segment, channelId);
         }
 
-        internal void Update()
+        internal override void Update()
         {
+            base.Update();
+
             // should we still process a connected event?
             if (connectedEventPending)
             {
