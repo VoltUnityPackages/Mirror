@@ -48,12 +48,10 @@ Making multiplayer games this way is fun & easy. Instead of MonoBehaviour, Mirro
 * **[SyncVar]** / SyncList to automatically synchronize variables from Server->Client
 
 ## Getting Started
-1. Setup [UnityNuGet](https://github.com/xoofx/UnityNuGet)
-2. Install [UniTask](https://github.com/Cysharp/UniTask#upm-package)
+1. Setup [UnityNuGet](https://github.com/xoofx/UnityNuGet#unitynuget-)
+2. Install [UniTask](https://github.com/Cysharp/UniTask#upm-package) (Either way)
 3. Open up the package manager via Windows **->** Package Manager
 4. Click on the little + sign **->** Add package from git URL...
-5. Add `https://github.com/VoltUnityPackages/UnitySystemBuffers.git`
-6. Add `https://github.com/VoltUnityPackages/UnitySystemThreadingTasksExtensions.git`
 7. Add `https://github.com/VoltUnityPackages/Mirror.git?path=/Assets/Mirror`
 
 Check out our [Documentation](https://mirror-networking.gitbook.io/) to learn how it all works.
