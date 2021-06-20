@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -7,6 +9,18 @@ using UnityEngine.TestTools;
 namespace Mirror.Tests
 {
     struct TestMessage1 : NetworkMessage {}
+
+    struct VariableSizedMessage : NetworkMessage
+    {
+        // weaver serializes byte[] wit WriteBytesAndSize
+        public byte[] payload;
+        // so payload := size - 4
+        // then the message is exactly maxed size.
+        //
+        // NOTE: we have a LargerMaxMessageSize test which guarantees that
+        //       variablesized + 1 is exactly transport.max + 1
+        public VariableSizedMessage(int size) => payload = new byte[size - 4];
+    }
 
     public class CommandTestNetworkBehaviour : NetworkBehaviour
     {
@@ -227,13 +241,13 @@ namespace Mirror.Tests
             NetworkServer.Listen(1);
 
             // add first connection
-            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42, false);
+            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42);
             Assert.That(NetworkServer.AddConnection(conn42), Is.True);
             Assert.That(NetworkServer.connections.Count, Is.EqualTo(1));
             Assert.That(NetworkServer.connections[42], Is.EqualTo(conn42));
 
             // add second connection
-            NetworkConnectionToClient conn43 = new NetworkConnectionToClient(43, false);
+            NetworkConnectionToClient conn43 = new NetworkConnectionToClient(43);
             Assert.That(NetworkServer.AddConnection(conn43), Is.True);
             Assert.That(NetworkServer.connections.Count, Is.EqualTo(2));
             Assert.That(NetworkServer.connections[42], Is.EqualTo(conn42));
@@ -247,13 +261,13 @@ namespace Mirror.Tests
             NetworkServer.Listen(1);
 
             // add a connection
-            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42, false);
+            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42);
             Assert.That(NetworkServer.AddConnection(conn42), Is.True);
             Assert.That(NetworkServer.connections.Count, Is.EqualTo(1));
             Assert.That(NetworkServer.connections[42], Is.EqualTo(conn42));
 
             // add duplicate connectionId
-            NetworkConnectionToClient connDup = new NetworkConnectionToClient(42, false);
+            NetworkConnectionToClient connDup = new NetworkConnectionToClient(42);
             Assert.That(NetworkServer.AddConnection(connDup), Is.False);
             Assert.That(NetworkServer.connections.Count, Is.EqualTo(1));
             Assert.That(NetworkServer.connections[42], Is.EqualTo(conn42));
@@ -266,7 +280,7 @@ namespace Mirror.Tests
             NetworkServer.Listen(1);
 
             // add connection
-            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42, false);
+            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42);
             Assert.That(NetworkServer.AddConnection(conn42), Is.True);
             Assert.That(NetworkServer.connections.Count, Is.EqualTo(1));
 
@@ -282,7 +296,7 @@ namespace Mirror.Tests
             NetworkServer.Listen(1);
 
             // add connection
-            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42, false);
+            NetworkConnectionToClient conn42 = new NetworkConnectionToClient(42);
             NetworkServer.AddConnection(conn42);
             Assert.That(NetworkServer.connections.Count, Is.EqualTo(1));
 
@@ -324,6 +338,303 @@ namespace Mirror.Tests
 
             // did it get through?
             Assert.That(called, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Send_ServerToClientMessage()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkClient.RegisterHandler<TestMessage1>(msg => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out NetworkConnectionToClient connectionToClient);
+
+            // send message & process
+            connectionToClient.Send(new TestMessage1());
+            ProcessMessages();
+
+            // did it get through?
+            Assert.That(called, Is.EqualTo(1));
+        }
+
+        // guarantee that exactly max packet size messages work
+        [Test]
+        public void Send_ClientToServerMessage_MaxMessageSize()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkServer.RegisterHandler<VariableSizedMessage>((conn, msg) => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out _);
+
+            // send message & process
+            int max = MessagePacking.MaxContentSize;
+            NetworkClient.Send(new VariableSizedMessage(max));
+            ProcessMessages();
+
+            // did it get through?
+            Assert.That(called, Is.EqualTo(1));
+        }
+
+        // guarantee that exactly max packet size messages work
+        [Test]
+        public void Send_ServerToClientMessage_MaxMessageSize()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkClient.RegisterHandler<VariableSizedMessage>(msg => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out NetworkConnectionToClient connectionToClient);
+
+            // send message & process
+            int max = MessagePacking.MaxContentSize;
+            connectionToClient.Send(new VariableSizedMessage(max));
+            ProcessMessages();
+
+            // did it get through?
+            Assert.That(called, Is.EqualTo(1));
+        }
+
+        // guarantee that exactly max message size + 1 doesn't work anymore
+        [Test]
+        public void Send_ClientToServerMessage_LargerThanMaxMessageSize()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkServer.RegisterHandler<VariableSizedMessage>((conn, msg) => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out _);
+
+            // calculate max := transport.max - message header
+
+            // send message & process
+            int transportMax = transport.GetMaxPacketSize(Channels.Reliable);
+            int messageMax = MessagePacking.MaxContentSize;
+            LogAssert.Expect(LogType.Error, $"NetworkConnection.ValidatePacketSize: cannot send packet larger than {transportMax} bytes, was {transportMax + 1} bytes");
+            NetworkClient.Send(new VariableSizedMessage(messageMax + 1));
+            ProcessMessages();
+
+            // should be too big to send
+            Assert.That(called, Is.EqualTo(0));
+        }
+
+        // guarantee that exactly max message size + 1 doesn't work anymore
+        [Test]
+        public void Send_ServerToClientMessage_LargerThanMaxMessageSize()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkClient.RegisterHandler<VariableSizedMessage>(msg => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out NetworkConnectionToClient connectionToClient);
+
+            // send message & process
+            int transportMax = transport.GetMaxPacketSize(Channels.Reliable);
+            int messageMax = MessagePacking.MaxContentSize;
+            LogAssert.Expect(LogType.Error, $"NetworkConnection.ValidatePacketSize: cannot send packet larger than {transportMax} bytes, was {transportMax + 1} bytes");
+            connectionToClient.Send(new VariableSizedMessage(messageMax + 1));
+            ProcessMessages();
+
+            // should be too big to send
+            Assert.That(called, Is.EqualTo(0));
+        }
+
+        // transport recommends a max batch size.
+        // but we support up to max packet size.
+        // for example, with KCP it makes sense to always send MTU sized batches.
+        // but we can send up to 144 KB messages.
+        // => make sure this works. it's a special path in the code and used to
+        //    cause a bug in uMMORPG where SpawnMessage would be > MTU, the
+        //    timestamp would not be included because > max batch, hence client
+        //    couldn't parse it properly.
+        [Test]
+        public void Send_ClientToServerMessage_LargerThanBatchThreshold()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkServer.RegisterHandler<VariableSizedMessage>((conn, msg) => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out _);
+
+            // send message & process
+            int threshold = transport.GetBatchThreshold(Channels.Reliable);
+            NetworkClient.Send(new VariableSizedMessage(threshold + 1));
+            ProcessMessages();
+
+            // did it get through?
+            Assert.That(called, Is.EqualTo(1));
+        }
+
+        // transport recommends a max batch size.
+        // but we support up to max packet size.
+        // for example, with KCP it makes sense to always send MTU sized batches.
+        // but we can send up to 144 KB messages.
+        // => make sure this works. it's a special path in the code and used to
+        //    cause a bug in uMMORPG where SpawnMessage would be > MTU, the
+        //    timestamp would not be included because > max batch, hence client
+        //    couldn't parse it properly.
+        [Test]
+        public void Send_ServerToClientMessage_LargerThanBatchThreshold()
+        {
+            // register handler
+            int called = 0;
+            NetworkClient.RegisterHandler<VariableSizedMessage>(msg => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out NetworkConnectionToClient connectionToClient);
+
+            // send large message & process
+            int threshold = transport.GetBatchThreshold(Channels.Reliable);
+            connectionToClient.Send(new VariableSizedMessage(threshold + 1));
+            ProcessMessages();
+
+            // did it get through?
+            Assert.That(called, Is.EqualTo(1));
+        }
+
+        // there used to be a data race where messages > batch threshold would
+        // be sent directly, instead of being flushed at the end of the frame
+        // like all the smaller messages.
+        // make sure this never happens again.
+        [Test]
+        public void Send_ClientToServerMessage_LargerThanBatchThreshold_SentInOrder()
+        {
+            // register two message handlers
+            List<string> received = new List<string>();
+            NetworkServer.RegisterHandler<TestMessage1>((conn, msg) => received.Add("smol"), false);
+            NetworkServer.RegisterHandler<VariableSizedMessage>((conn, msg) => received.Add("big"), false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out _);
+
+            // send small message first
+            NetworkClient.Send(new TestMessage1());
+
+            // send large message
+            int threshold = transport.GetBatchThreshold(Channels.Reliable);
+            NetworkClient.Send(new VariableSizedMessage(threshold + 1));
+
+            // process everything
+            ProcessMessages();
+
+            // both arrived, and small arrived before large?
+            Assert.That(received.Count, Is.EqualTo(2));
+            Assert.That(received[0], Is.EqualTo("smol"));
+            Assert.That(received[1], Is.EqualTo("big"));
+        }
+
+        // there used to be a data race where messages > batch threshold would
+        // be sent directly, instead of being flushed at the end of the frame
+        // like all the smaller messages.
+        // make sure this never happens again.
+        [Test]
+        public void Send_ServerToClientMessage_LargerThanBatchThreshold_SentInOrder()
+        {
+            // register two message handlers
+            List<string> received = new List<string>();
+            NetworkClient.RegisterHandler<TestMessage1>(msg => received.Add("smol"), false);
+            NetworkClient.RegisterHandler<VariableSizedMessage>(msg => received.Add("big"), false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out NetworkConnectionToClient connectionToClient);
+
+            // send small message first
+            connectionToClient.Send(new TestMessage1());
+
+            // send large message
+            int threshold = transport.GetBatchThreshold(Channels.Reliable);
+            connectionToClient.Send(new VariableSizedMessage(threshold + 1));
+
+            // process everything
+            ProcessMessages();
+
+            // both arrived, and small arrived before large?
+            Assert.That(received.Count, Is.EqualTo(2));
+            Assert.That(received[0], Is.EqualTo("smol"));
+            Assert.That(received[1], Is.EqualTo("big"));
+        }
+
+        // make sure NetworkConnection.remoteTimeStamp is always the time on the
+        // remote end when the message was sent
+        [Test]
+        public void Send_ClientToServerMessage_SetsRemoteTimeStamp()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkServer.RegisterHandler<TestMessage1>((conn, msg) => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out NetworkConnectionToClient connectionToClient);
+
+            // send message
+            NetworkClient.Send(new TestMessage1());
+
+            // remember current time & update NetworkClient IMMEDIATELY so the
+            // batch is finished with timestamp.
+            double sendTime = NetworkTime.localTime;
+            NetworkClient.NetworkLateUpdate();
+
+            // let some time pass before processing
+            const int waitTime = 100;
+            Thread.Sleep(waitTime);
+            ProcessMessages();
+
+            // is the remote timestamp set to when we sent it?
+            // remember the time when we sent the message
+            // (within 1/10th of the time we waited. we need some tolerance
+            //  because we don't capture NetworkTime.localTime exactly when we
+            //  finish the batch. but the difference should not be > 'waitTime')
+            Assert.That(called, Is.EqualTo(1));
+            Assert.That(connectionToClient.remoteTimeStamp, Is.EqualTo(sendTime).Within(waitTime / 10));
+        }
+
+        [Test]
+        public void Send_ServerToClientMessage_SetsRemoteTimeStamp()
+        {
+            // register a message handler
+            int called = 0;
+            NetworkClient.RegisterHandler<TestMessage1>(msg => ++called, false);
+
+            // listen & connect a client
+            NetworkServer.Listen(1);
+            ConnectClientBlocking(out NetworkConnectionToClient connectionToClient);
+
+            // send message
+            connectionToClient.Send(new TestMessage1());
+
+            // remember current time & update NetworkClient IMMEDIATELY so the
+            // batch is finished with timestamp.
+            double sendTime = NetworkTime.localTime;
+            NetworkServer.NetworkLateUpdate();
+
+            // let some time pass before processing
+            const int waitTime = 100;
+            Thread.Sleep(waitTime);
+            ProcessMessages();
+
+            // is the remote timestamp set to when we sent it?
+            // remember the time when we sent the message
+            // (within 1/10th of the time we waited. we need some tolerance
+            //  because we don't capture NetworkTime.localTime exactly when we
+            //  finish the batch. but the difference should not be > 'waitTime')
+            Assert.That(called, Is.EqualTo(1));
+            Assert.That(NetworkClient.connection.remoteTimeStamp, Is.EqualTo(sendTime).Within(waitTime / 10));
         }
 
         [Test]
