@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Mirror
 {
@@ -122,5 +123,7 @@ namespace Mirror
             }
             return true;
         }
+
+        public static bool IsHeadless => SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null;
     }
 }

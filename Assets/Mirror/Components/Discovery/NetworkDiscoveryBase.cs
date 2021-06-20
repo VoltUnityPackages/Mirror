@@ -67,9 +67,8 @@ namespace Mirror.Discovery
         public virtual void Start()
         {
             // Server mode? then start advertising
-#if UNITY_SERVER
-            AdvertiseServer();
-#endif
+            if(Utils.IsHeadless)
+                AdvertiseServer();
         }
 
         // Ensure the ports are cleared no matter when Game/Unity UI exits

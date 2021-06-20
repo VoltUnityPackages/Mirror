@@ -197,12 +197,10 @@ namespace Mirror
             // some transports might not be ready until Start.
             //
             // (tick rate is applied in StartServer!)
-#if UNITY_SERVER
-            if (autoStartServerBuild)
+            if (Utils.IsHeadless && autoStartServerBuild)
             {
                 StartServer();
             }
-#endif
         }
 
         // virtual so that inheriting classes' LateUpdate() can call base.LateUpdate() too
@@ -641,10 +639,9 @@ namespace Mirror
         public virtual void ConfigureServerFrameRate()
         {
             // only set framerate for server build
-#if UNITY_SERVER
-            Application.targetFrameRate = serverTickRate;
+            if(Utils.IsHeadless)
+                Application.targetFrameRate = serverTickRate;
             // Debug.Log("Server Tick Rate set to: " + Application.targetFrameRate + " Hz.");
-#endif
         }
 
         bool InitializeSingleton()
